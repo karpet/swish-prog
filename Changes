@@ -1,0 +1,66 @@
+Revision history for Perl extension Prog.
+
+0.01  Tue Nov 22 21:54:37 2005
+	- original version; created by h2xs 1.22 with options
+		-XA -n Prog
+
+0.02	POD fixes
+        added merge() add() and mv() methods to S::P::Index
+          and t/3merge.t and t/4add.t
+        added 2 more test docs
+        added format() accessor to S::P::Index
+        changed S::P::I to use Class::Accessor::Fast
+          since we don't need to override get/set
+        S::P now always inits an indexer even if fh=>0
+        added private _index_methods to S::P
+
+
+0.03    * removed all mentions of SWISH3
+        * test indexes are removed as part of 'make clean'
+        * switched from Data::Dumper to Data::Dump
+        * added new SWISH::Prog::Object example
+        * fixed bug in SWISH::Prog::Headers to test defined() 
+          rather than simply eval true/false
+        * fixed bug in SWISH::Prog::DBI with accepting DBI handle
+          in init()
+        * changed to using IO::All instead of File::stat and File::Slurp
+          for better UTF8 support
+        * changed default order of init() and init_indexer() to work
+          more intuitively. Fixed S::P::DBI accordingly.
+          To prevent an indexer from being init'd (as in 0.02) simply
+          override init_indexer() and don't call SUPER::init_indexer().
+        * new feature: SWISH::Prog::Find
+        * renamed meta() to table_meta() in SWISH::Prog::DBI for clarity.
+        * S::P::Config now always handles config params as arrays
+        * Config metanames() propertynames() and propertynamesnostripchars() 
+          are no longer available 
+        * S::P::Config now requires IO::All and Config::General; added read2() method.
+        * new feature placeholder: SWISH::Prog::Spider
+        
+0.04    * S::P::DBI no longer calls disconnect() on db handle in DESTROY
+        * fixed bug with auto-defining metanames
+        * S::P::Config always returns arrayref on directive method calls
+        * use MIME::Types instead of File::Type
+        * S::P::Find now uses File::Find instead of Path::Class::Iterator
+        * S::P::Object obj_filter() must return an object of some kind
+        * S::P::Object will not dump() scalar strings, thus avoiding extra quotes
+        * S::P::Config added stringify() method and reverted from IO::All to File::Slurp
+        * S::Prog added elapsed() method
+        * S::Prog new() verbose now defaults to 1
+
+0.05    * S::P::Object now uses JSON or YAML to serialize values instead of Data::Dump
+          This change is sync'd with SWISH::API::Object 0.0.6
+
+0.06    * S::P::Object now defers to explicit 'config' passed in new().
+
+0.07    * S::P::Object iterator now uses more idiomatic while/next algorithm.
+
+0.08    22 Nov 2007
+        * added S::P::Mail class and example swishmail.pl script
+        * sync all $VERSION vars to same value
+        * allow for non-standard docclass names
+
+
+0.20    xxx
+        * complete rewrite of the API for Swish3 development
+

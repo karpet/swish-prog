@@ -1,0 +1,33 @@
+SWISH::Prog notes
+============================= 
+
+base class - keep it simple
+SWISH::Prog->new = 
+
+    indexer handle
+    UA handle
+    fetch() method returns SWISH::Prog::Doc object, reads doc into buffer, headers, etc.
+    index() method hands to indexer and can take either string or Doc object
+    filter() - takes a Doc object, called in index()
+    ok() - takes a Doc object, called in index()
+    
+SWISH::Prog::Doc methods
+
+each method corresponds to a Header line, plus content()
+url()
+modtime()
+mime() / type() (alias-> mime)  -- use File::Type
+parser() - use parser map
+content()
+
+as_string() returns object as scalar string, ready for indexer
+
+print $Doc should stringify same as as_string()
+
+use overload
+  (
+   '""' => \&as_string,
+   fallback => 1,
+  );
+
+
