@@ -23,7 +23,7 @@ my %allopts = (
     'verbose'    => 'be verbose',
     debug        => 'debugging',
     warnings     => 'print libxml2 warnings',
-    'aggregator' => 'aggregator type',
+    'aggregator=s' => 'aggregator type',
 );
 
 GetOptions( $Opt, keys %allopts ) or croak $usage;
