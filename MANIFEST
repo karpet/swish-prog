@@ -28,4 +28,14 @@ t/pod-coverage.t
 t/test.html
 t/test2.html
 t/test.xml
-META.yml                                 Module meta-data (added by MakeMaker)
+lib/SWISH/Prog/Aggregator/Spider/UA.pm
+lib/SWISH/Prog/Cache.pm
+lib/SWISH/Prog/Class.pm
+lib/SWISH/Prog/Queue.pm
+lib/SWISH/Prog/Utils.pm
+t/00_synopsis.t
+t/06_config.t
+t/maildir/.INBOX/cur/1201404060.V802I5f9e4M893922.louvin.peknet.com:2,
+t/test.conf
+t/test.pdf
+t/test.pdf.gz
