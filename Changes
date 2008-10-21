@@ -66,5 +66,7 @@ Revision history for Perl extension Prog.
 
 0.21    xxx
         * fix tests to skip correct numbers if swish-e not installed
+        * change to JSON::XS and make json default format in Aggregator::Object
+        * add perl_to_xml() in Utils
 
 
