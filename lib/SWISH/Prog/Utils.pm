@@ -44,7 +44,7 @@ Hash of MIME types to their equivalent parser.
 
 =cut
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 our $ExtRE   = qr{(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3)(\.gz)?}io;
 our $XML     = Search::Tools::XML->new;
 
