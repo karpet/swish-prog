@@ -110,7 +110,7 @@ time().
 
 =item serial_format
 
-Which format to use in serialize(). Default is C<yaml>. You can also use C<json>.
+Which format to use in serialize(). Default is C<json>. You can also use C<yaml>.
 If you don't like either of those, subclass SWISH::Prog::Aggregator::Object 
 and override serialize() to provide your own format.
 
@@ -129,7 +129,7 @@ sub init {
     $self->{title}         ||= 'title';
     $self->{url}           ||= 'url';
     $self->{modtime}       ||= 'modtime';
-    $self->{serial_format} ||= 'yaml';      # better self-reference support
+    $self->{serial_format} ||= 'json'; 
 
     unless ( $self->{methods} ) {
         croak "methods required";
