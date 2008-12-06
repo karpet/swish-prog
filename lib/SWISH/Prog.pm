@@ -73,6 +73,7 @@ my %short = (
     native => 'SWISH::Prog::Indexer::Native',
     xapian => 'SWISH::Prog::Indexer::Xapian',
     ks     => 'SWISH::Prog::Indexer::KinoSearch',
+    dbi    => 'SWISH::Prog::Indexer::DBI',
 );
 
 sub init {
