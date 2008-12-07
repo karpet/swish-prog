@@ -7,7 +7,7 @@ use Carp;
 use File::Slurp;
 use File::Find;
 
-our $VERSION = '0.21';
+our $VERSION = '0.22';
 
 =pod
 
@@ -164,6 +164,9 @@ sub _do_file {
         my $doc = $self->get_doc( $file, [ stat(_) ], $ext );
         $self->swish_filter($doc);
         $self->{indexer}->process($doc);
+    }
+    else {
+        $self->debug and warn "skipping $file\n";
     }
 }
 

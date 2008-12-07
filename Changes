@@ -70,4 +70,6 @@ Revision history for Perl extension Prog.
         * add perl_to_xml() in Utils
         * change t/04 to manually create dirs at test time
 
+0.22    xxx
+        * added support for SWISH::Prog::DBI
 
