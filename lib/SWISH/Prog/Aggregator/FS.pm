@@ -116,6 +116,8 @@ sub dir_ok {
     return 0 if $dir =~ m/^\.[^\.]/;        # could be ../foo
     return 0 if $dir =~ m!/(\.svn|RCS)/!;
 
+    $self->verbose and print "$dir .. ok\n";
+
     1;                                      # TODO esp RecursionDepth
 }
 

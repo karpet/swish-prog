@@ -64,12 +64,14 @@ Overrides base SWISH::Prog::Class init() method.
 =cut
 
 # allow for short names. we map to class->new
-my %short = (
+my %ashort = (
     fs     => 'SWISH::Prog::Aggregator::FS',
     mail   => 'SWISH::Prog::Aggregator::Mail',
     dbi    => 'SWISH::Prog::Aggregator::DBI',
     spider => 'SWISH::Prog::Aggregator::Spider',
     object => 'SWISH::Prog::Aggregator::Object',
+);
+my %ishort = (
     native => 'SWISH::Prog::Indexer::Native',
     xapian => 'SWISH::Prog::Indexer::Xapian',
     ks     => 'SWISH::Prog::Indexer::KinoSearch',
@@ -91,8 +93,8 @@ sub init {
     $indexer = $self->{indexer} || 'native';
     if ( !blessed($indexer) ) {
 
-        if ( exists $short{$indexer} ) {
-            $indexer = $short{$indexer};
+        if ( exists $ishort{$indexer} ) {
+            $indexer = $ishort{$indexer};
         }
 
         eval "require $indexer";
@@ -101,12 +103,8 @@ sub init {
         }
         $indexer = $indexer->new(
             debug    => $self->debug,
-            invindex => blessed( $self->{invindex} )
-            ? $self->{invindex}
-            : SWISH::Prog::InvIndex::Native->new(
-                invindex => $self->{invindex}
-            ),
-            verbose => $self->verbose
+            invindex => $self->{invindex},
+            verbose  => $self->verbose
         );
     }
     elsif ( !$indexer->isa('SWISH::Prog::Indexer') ) {
@@ -137,8 +135,8 @@ sub init {
     $aggregator = $self->{aggregator} || 'fs';
     if ( !blessed($aggregator) ) {
 
-        if ( exists $short{$aggregator} ) {
-            $aggregator = $short{$aggregator};
+        if ( exists $ashort{$aggregator} ) {
+            $aggregator = $ashort{$aggregator};
         }
 
         eval "require $aggregator";
