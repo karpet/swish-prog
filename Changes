@@ -72,4 +72,5 @@ Revision history for Perl extension Prog.
 
 0.22    xxx
         * added support for SWISH::Prog::DBI
+        * use SWISH::3 for slurping files, if available.
 

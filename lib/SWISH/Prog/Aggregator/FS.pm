@@ -61,6 +61,11 @@ sub init {
         $self->{_ext_re} = $SWISH::Prog::Utils::ExtRE;
     }
 
+    # if running with SWISH::3, instantiate one for the slurp advantage
+    if ( $ENV{SWISH3} ) {
+        $self->{_swish3} = SWISH::3->new;
+    }
+
 }
 
 =head2 file_ok( I<full_path> )
@@ -85,7 +90,7 @@ sub file_ok {
 
     return 0 unless $ext;
     return 0 if $full_path =~ m![\\/](\.svn|RCS)[\\/]!; # TODO configure this.
-    return 0 if $file      =~ m/^\./;
+    return 0 if $file =~ m/^\./;
 
     #carp "parsed file: $file\npath: $path\next: $ext";
 
@@ -133,9 +138,15 @@ sub get_doc {
     my ( $stat, $ext ) = @_;
     my $buf;
 
-    # the SWISH::3->slurp is about 30% faster.
-    # TODO refactor into a SWISH::3::Utils ??
-    eval { $buf = read_file( $url, binmode => ':raw' ) };
+    # the SWISH::3->slurp is about 50% faster
+    # but obviously only available if SWISH::3 is loaded.
+    if ( $self->{_swish3} ) {
+        eval { $buf = $self->{_swish3}->slurp($url) };
+    }
+    else {
+        eval { $buf = read_file( $url, binmode => ':raw' ) };
+    }
+
     if ($@) {
         carp "unable to read $url - skipping";
         return;
