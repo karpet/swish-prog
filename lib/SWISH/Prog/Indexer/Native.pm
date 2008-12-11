@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw( SWISH::Prog::Indexer );
 use Carp;
+use File::Temp ();
 use SWISH::Prog::InvIndex::Native;
 use SWISH::Prog::Config;
 use Scalar::Util qw( blessed );
