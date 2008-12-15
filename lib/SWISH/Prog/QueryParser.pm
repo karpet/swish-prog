@@ -6,10 +6,10 @@ use Carp;
 use POSIX qw(locale_h);    # make sure we get correct ->utf8 encoding
 use locale;
 use Search::Tools::UTF8;
-use Search::QueryParser;
+use Search::QueryParser::SQL;
 use SWISH::Prog::Query;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 __PACKAGE__->mk_accessors(
     qw(
@@ -23,12 +23,55 @@ __PACKAGE__->mk_accessors(
         locale
         lang
         charset
+        query_class
+        config
         ),
 );
+
+=head1 NAME
+
+SWISH::Prog::QueryParser - turn text strings into Query objects
+
+=head1 SYNOPSIS
+
+ my $parser = SWISH::Prog::QueryParser->new(
+        charset         => 'iso-8859-1',
+        phrase_delim    => '"',
+        and_word        => 'and',
+        or_word         => 'or',
+        not_word        => 'not',
+        wildcard        => '*',
+        stopwords       => [],
+        ignore_case     => 1,
+        query_class     => 'SWISH::Prog::Query',
+        config          => $swish_prog_config,
+    );
+ my $query = $parser->parse( 'foo not bar or bing' );
+
+=head1 DESCRIPTION
+
+SWISH::Prog::QueryParser turns text strings into Query objects.
+The query class defaults to SWISH::Prog::Query but you can
+set it in the new() method.
+
+This class depends on Search::QueryParser::SQL for the heavy lifting.
+See the documentation for Search::QueryParser::SQL for details
+on affecting the parsing behaviour.
+
+=head1 METHODS
+
+
+=head2 init
+
+=cut
 
 sub init {
     my $self = shift;
     $self->SUPER::init(@_);
+
+    if ( !$self->config ) {
+        croak "SWISH::Prog::Config object required";
+    }
 
     # set defaults
     $self->{locale} ||= setlocale(LC_CTYPE);
@@ -43,13 +86,21 @@ sub init {
     $self->{stopwords}    ||= [];
     $self->{ignore_case} = 1 unless defined $self->{ignore_case};
 
-    $self->{parser} = Search::QueryParser->new(
-        rxAnd => qr{$self->{and_word}}i,
-        rxOr  => qr{$self->{or_word}}i,
-        rxNot => qr{$self->{not_word}}i,
+    $self->{query_class} ||= 'SWISH::Prog::Query';
+
+    # TODO get other MetaNames from config
+    $self->{parser} = Search::QueryParser::SQL->new(
+        columns        => [qw( swishdefault )],
+        default_column => 'swishdefault',
     );
 
 }
+
+=head2 parse( I<string> )
+
+Returns a Query object blessed into query_class().
+
+=cut
 
 sub parse {
     my $self = shift;
@@ -61,7 +112,7 @@ sub parse {
     $str = to_utf8($str);
     my $q = $self->{parser}->parse( $str, 1 )
         or croak $self->{parser}->err;
-    return SWISH::Prog::Query->new( q => $q, parser => $self->{parser} );
+    return $self->{query_class}->new( q => $q, parser => $self->{parser} );
 }
 
 1;

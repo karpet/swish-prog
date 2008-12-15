@@ -13,7 +13,7 @@ my %required = (
     'Scalar::Util'          => 0,
     'Test::More'            => 0,
     'File::Slurp'           => 0,         # Search::Tools also requires this
-
+    'Search::QueryParser::SQL' => 0,
 );
 
 my %recommended = (

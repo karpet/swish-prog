@@ -1,24 +1,30 @@
-use Test::More tests => 2;
-
+use Test::More tests => 3;
 
 use_ok('SWISH::Prog::QueryParser');
+use_ok('SWISH::Prog::Config');
 
 my %str = (
 
-    'foo AND bar'           => '',
-    'bar OR foo'            => '',
-    'foo NEAR10 bar'        => '',
-    'foo NOT bar'           => '',
-    'title:foo OR body:bar' => '',
+    'foo bar'               => '',
+    'bar or foo'            => '',
+    '"foo bar"~10'          => '',
+    'foo not bar'           => '',
+    'title:foo or body:bar' => '',
     '(foo AND bar) or quz'  => '',
 
 );
 
-ok( my $parser = SWISH::Prog::QueryParser->new, "parser" );
+ok( my $parser = SWISH::Prog::QueryParser->new(
+        config => SWISH::Prog::Config->new(),
+
+    ),
+    "parser"
+);
 
 for my $s ( sort keys %str ) {
     my $q = $parser->parse($s);
-    #diag("$s  ->  $q");
+    diag("$s  ->  $q");
+
     #diag( $q->dump );
 
 }

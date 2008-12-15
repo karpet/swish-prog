@@ -16,6 +16,8 @@ lib/SWISH/Prog/Aggregator/Spider.pm
 lib/SWISH/Prog/Aggregator/FS.pm
 lib/SWISH/Prog/Aggregator/Object.pm
 lib/SWISH/Prog/Aggregator/Mail.pm
+lib/SWISH/Prog/Searcher.pm
+lib/SWISH/Prog/Results.pm
 examples/swishagr
 README
 t/01_fs.t

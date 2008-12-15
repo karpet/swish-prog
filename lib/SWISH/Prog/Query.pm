@@ -4,7 +4,7 @@ use warnings;
 use base qw( SWISH::Prog::Class );
 use Carp;
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 __PACKAGE__->mk_ro_accessors(qw( q parser ));
 
@@ -13,9 +13,43 @@ use overload(
     fallback => 1,
 );
 
+=head1 NAME
+
+SWISH::Prog::Query - a Query object base class
+
+=head1 SYNOPSIS
+
+ my $parser = SWISH::Prog::QueryParser->new(
+        charset         => 'iso-8859-1',
+        phrase_delim    => '"',
+        and_word        => 'and',
+        or_word         => 'or',
+        not_word        => 'not',
+        wildcard        => '*',
+        stopwords       => [],
+        ignore_case     => 1,
+        query_class     => 'SWISH::Prog::Query',
+    );
+ my $query = $parser->parse( 'foo not bar or bing' );
+
+=head1 DESCRIPTION
+
+SWISH::Prog::Query is a base class representing a query.
+You create Query objects and pass them to a Searcher.
+
+=head1 METHODS
+
+
+=head2 stringify
+
+Turn the object back into string. This method is called
+whenever the object is printed.
+
+=cut
+
 sub stringify {
     my $self = shift;
-    return $self->parser->unparse( $self->q );
+    return $self->q->stringify;
 }
 
 1;

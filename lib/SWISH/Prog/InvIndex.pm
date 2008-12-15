@@ -11,7 +11,7 @@ use overload(
     fallback => 1,
 );
 
-our $VERSION = '0.23';
+our $VERSION = '0.24';
 
 __PACKAGE__->mk_accessors(qw( path clobber ));
 
@@ -39,7 +39,7 @@ sub open {
     }
 
     if ( !-d $self->path ) {
-        $self->path->mkpath($self->verbose);
+        $self->path->mkpath( $self->verbose );
     }
 
     1;
