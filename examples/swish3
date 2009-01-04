@@ -1,238 +1,136 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
+#
+# SWISH::Prog-based swish3 example
 
-use 5.8.3;
 use strict;
 use warnings;
-
-use lib qw(
-  /Users/karpet/swishdev/libswish3/bindings/perl/blib/lib
-  /Users/karpet/swishdev/libswish3/bindings/perl/blib/arch
-  /Users/karpet/projects/cpan/SWISH-Filter/lib
-  /Users/karpet/projects/cpan/SWISH-Prog/lib
-
-  );
-
 use Carp;
-use Data::Dump qw( pp );
-use Getopt::Long;
-use Pod::Usage;
+use SWISH::Prog;
+use Getopt::Long qw(:config no_ignore_case);
+
+my $VERSION = '3.0.0';
+
+my $USAGE = qq{$0 
+ usage:
+    swish [-e] [-i dir file ... ] [-S aggregator] [-c file] [-f invindex] [-l] [-v (num)]
+    swish -w word1 word2 ... [-f file1 file2 ...] \
+          [-P phrase_delimiter] [-p prop1 ...] [-s sortprop1 [asc|desc] ...] \
+          [-m num] [-t str] [-d delim] [-H (num)] [-x output_format] \
+          [-R rank_scheme] [-L prop low high]
+    swish -k (char|*) [-f invindex1 invindex2 ...]
+    swish -M invindex1 invindex2 ... outputfile
+    swish -N /path/to/compare/file
+    swish -V
+
+ options: defaults are in brackets
+ # commented options are not yet supported
+    #-b : begin results at this number
+    -c : configuration file(s) to use for indexing
+    #-d : next param is delimiter.
+    -D  : Debug mode
+    #-E : Append errors to file specified, or stderr if file not specified.
+    #-e : "Economic Mode": The index proccess uses less RAM.
+    -f : invindex dir to create or search from [index.swish]
+    -F : next param is invindex format
+    #-H : "Result Header Output": verbosity (0 to 9)  [1].
+    -i : create an index from the specified files
+        for "-S fs" - specify a list of files or directories
+        for "-S spider" - specify a list of URLs
+    #-k : Print words starting with a given char.
+    #-l : follow symbolic links when indexing
+    #-L : Limit results to a range of property values
+    #-M : merges index files
+    #-m : the maximum number of results to return [defaults to all results]
+    #-N : index only files with a modification date newer than path supplied
+    #-P : next param is Phrase delimiter.
+    #-p : include these document properties in the output "prop1 prop2 ..."
+    #-R : next param is Rank Scheme number (0 to 1)  [0].
+    -S : specify which indexing system to use.
+    Valid options are:
+        "fs" - index local files in your File System
+        "spider" - index web site files using a web crawler
+    The default value is: "fs"
+    -s : sort by these document properties in the output "prop1 prop2 ..."
+    #-T : Trace options ('-T help' for info)
+    #-t : tags to search in - specify as a string
+    #    "HBthec" - in Head|Body|title|header|emphasized|comments
+    -V : prints the current version
+    -v : indexing verbosity level (0 to 3) [-v 1]
+    -w : search for words "word1 word2 ..."
+    #-W : next param is ParserWarnLevel [-W 2]
+    #-x : "Extended Output Format": Specify the output format.
+
+version: $VERSION
+ docs: http://swish-e.org
+};
 
 my $Opt = {
-
-    'index' => 'index.swish3',         # use DEF in libswishp ??
-    root    => '.',
-    format  => 'Xapian',
-    debug   => 0,
-    verbose => 1,
-    help    => sub { pod2usage(1) },
-    man => sub { pod2usage(-exitstatus => 1, -verbose => 2) },
-
+    verbose  => 0,
+    Version  => 0,
+    Debug    => 0,
+    config   => '',         #SWISH::Prog::Config->new
+    Warnings => 0,
+    Source   => 'fs',
+    Format   => 'native',
+    query    => '',
+    input    => 0,
 };
 
 my %allopts = (
-
-    'index=s'   => 'name of index',
-    'root=s'    => 'path to index',
-    'format=s'  => 'index format',
-    'debug=i'   => 'debugging level',
-    'verbose=i' => 'verbosity level',
-    help        => 'print help',
-    man         => 'print man page',
-
+    'config=s'            => 'config file',
+    'verbose'             => 'be verbose',
+    'debug|Debug'         => 'debugging',
+    'Warnings=i'          => 'print libxml2 warnings',
+    'aggregator|Source=s' => 'aggregator type',
+    'Format=s'            => 'indexer type (native, ks, xapian, dbi)',
+    'query|words=s'       => 'search query',
+    'input'               => 'indexing mode',
 );
 
-GetOptions($Opt, keys %allopts) || pod2usage(1);
+GetOptions( $Opt, keys %allopts ) or die $USAGE;
 
-pod2usage(1) unless -s $Opt->{root};
+#croak $USAGE unless @ARGV;
 
-#pp($Opt);
-
-# here's where all the work gets done
-{
-
-    package Swish3;
-    use strict;
-    use Carp;
-    use Data::Dump qw( pp );
-    use base qw( SWISH::Prog );
-    use SWISH::3::Parser;
-    use SWISH::3::Constants;
-
-    __PACKAGE__->mk_accessors(qw( props parser ));
-
-    # setup
-    my $indexer_class;
-    my $doc_class;
-    my $format = lc($Opt->{format});
-    my %i = (
-             'xapian'     => 'Xapian',
-             'kinosearch' => 'KinoSearch',
-            );
-
-    if (exists $i{$format})
-    {
-        $indexer_class = join('::', 'SWISH', '3', $i{$format}, 'Indexer');
-        $doc_class     = join('::', 'SWISH', '3', $i{$format}, 'Doc');
-        eval "require $indexer_class";
-        if ($@)
-        {
-            croak "error loading Indexer class $indexer_class:\n$@";
-        }
-        eval "require $doc_class";
-        if ($@)
-        {
-            croak "error loading Indexer class $doc_class:\n$@";
-        }
-    }
-    else
-    {
-        croak "unknown index format: $Opt->{format}";
-    }
-
-    # create config, parser and indexer objects
-    sub init_indexer
-    {
-        my $self       = shift;
-        my $xml_config = $self->config->ver2_to_xml;
-
-        $ENV{SWISH_DEBUG} = $Opt->{debug};
-
-        #carp "xml config: $xml_config";
-        $self->parser(
-                      SWISH::3::Parser->new(
-                                            handler => \&handler,
-                                            config  => $xml_config,
-                                           )
-                     );
-        $self->parser->set_stash(
-                         indexer => $indexer_class->new(path => $Opt->{index}));
-
-        # TODO pass other opts
-
-    }
-
-    # call parser on a single doc
-    sub index
-    {
-        my $self = shift;
-        my $doc  = shift or croak "Swish3::Doc required";
-
-        print "  swish3 indexing " . $doc->url . "\n";
-
-        #print $doc if $self->debug > 3;
-
-        $self->parser->parse_buf($doc->as_string);
-
-    }
-
-    # SWISH::3::Parser handler function
-    # this creates Doc object and stores it via Indexer
-    sub handler
-    {
-
-        my $data = shift || croak "no data in parser handler!!";
-
-        #carp pp $data;
-        #return;
-
-        my $parser  = $data->parser;    # SWISH::3::Parser object
-        my $indexer =
-          $parser->get_stash('indexer');    # SWISH::3::Indexer subclass
-
-        #carp pp($parser);
-
-        #carp $parser;
-
-        my $doc =
-          $doc_class->new(map { $_ => $data->doc->$_ } (SWISH_DOC_FIELDS));
-
-        #return;
-
-        while (my $swishword = $data->wordlist->next)
-        {
-            for my $w (SWISH_WORD_FIELDS)
-            {
-
-                #printf("%15s: %s\n", $w, $swishword->$w);
-            }
-
-            #print '-' x 45, "\n";
-        }
-
-        print $data->wordlist->nwords . " words\n";
-        print '-' x 80, "\n";
-
-    }
-
-    1;
-
-    package Swish3::Doc;
-    use strict;
-    use base qw(SWISH::Prog::Doc);
-
-    1;
+if ( $Opt->{input} ) {
+    $Opt->{indexer} = $Opt->{Format};
 }
 
-my $prog = Swish3->new(
-    debug  => $Opt->{debug},
-    config => SWISH::Prog::Config->new(
+Data::Dump::dump $Opt;
 
-        Words => '0 ParseWords'    # uncomment to tokenize ourselves
+my $prog = SWISH::Prog->new(%$Opt);
+if ( $Opt->{input} ) {
+    $prog->index(@ARGV);
+}
+elsif ( $Opt->{query} ) {
+    my $invindex = $prog->invindex;
+    my $meta     = $invindex->meta;
+    my $format   = $meta->Index->{Format};
+    my $sclass
+        = $format eq 'Native'
+        ? 'SWISH::Prog::Searcher::Native'
+        : "SWISH::Prog::${format}::Searcher";
+    eval "require $sclass";
+    croak $@ if $@;
+    my $searcher = $sclass->new(
+        invindex => $invindex->path . '',
+        config   => $prog->config,
+    );
+    my $results = $searcher->search( $Opt->{query} );
 
-    )
-);
-$prog->find($Opt->{root});
-print "Runtime: " . $prog->elapsed . " seconds\n";
-
-1;
-
-__END__
+    while ( my $result = $results->next ) {
+        printf( qq{%4d %s "%s"\n},
+            $result->score, $result->uri, $result->title );
+    }
+}
+elsif ( $Opt->{Version} ) {
+    print "$0 $VERSION\n";
+}
+else {
+    print $USAGE;
+}
+exit;
 
 =pod
-
-=head1 NAME
-
-swish3 - Perl implementation of Swish3
-
-=head1 SYNOPSIS
-
-  swish3 --root path/to/my/docs
-  
-
-=head1 DESCRIPTION
-
-B<swish3> is an example script for using SWISH::Prog with SWISH::3 (libswish3).
-
-=head1 OPTIONS
-
-=over
-
-=item root I<path>
-
-Root path from where to start aggregating documents. See SWISH::Prog::Find.
-
-=item index I<path>
-
-Path to the index.
-
-=item format I<indexer>
-
-Which SWISH::3::Indexer format to use. Default: C<Xapian>
-
-=item debug I<n>
-
-Turn on debugging output.
-
-=item help
-
-=item man
-
-=back
-
-
-=head1 METHODS
-
-
 
 =head1 AUTHOR
 
@@ -240,10 +138,10 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2007 by Peter Karman
+Copyright 2008 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
-
+it under the same terms as Perl itself. 
 
 =cut
+
