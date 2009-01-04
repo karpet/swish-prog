@@ -8,6 +8,7 @@ use Carp;
 use Data::Dump qw( dump );
 use Scalar::Util qw( blessed );
 use SWISH::Prog::Config;
+use SWISH::Prog::InvIndex;
 
 our $VERSION = '0.24';
 
@@ -81,6 +82,11 @@ my %ishort = (
 sub init {
     my $self = shift;
 
+    # search mode requires only invindex
+    if ( $self->{query} && !$self->{indexer} && !$self->{aggregator} ) {
+        return;
+    }
+
     # need to make sure we have 3 items:
     # aggregator
     # indexer
@@ -103,7 +109,7 @@ sub init {
         }
         $indexer = $indexer->new(
             debug    => $self->debug,
-            invindex => $self->{invindex},
+            invindex => $self->{invindex},    # may be undef
             verbose  => $self->verbose
         );
     }
@@ -161,13 +167,21 @@ sub init {
     $self->{aggregator} = $aggregator;
 }
 
-=head2 run
+=head2 run( I<collection> )
 
-Execute the program.
+Execute the program. This is an alias for index().
 
 =cut
 
-sub run {
+*run = \&index;
+
+=head2 index( I<collection> )
+
+Add items in I<collection> to the invindex().
+
+=cut
+
+sub index {
     my $self = shift;
     my $aggregator = $self->aggregator or croak 'aggregator required';
     unless ( $aggregator->isa('SWISH::Prog::Aggregator') ) {
@@ -187,7 +201,11 @@ Returns the aggregator's config() object.
 =cut
 
 sub config {
-    shift->aggregator->config;
+    my $self = shift;
+    if ( $self->aggregator ) {
+        return $self->aggregator->config;
+    }
+    return $self->{config} || SWISH::Prog::Config->new;
 }
 
 =head2 invindex
@@ -197,7 +215,11 @@ Returns the indexer's invindex.
 =cut
 
 sub invindex {
-    shift->indexer->invindex;
+    my $self = shift;
+    if ( $self->aggregator ) {
+        return $self->indexer->invindex;
+    }
+    return $self->{invindex} || SWISH::Prog::InvIndex->new;
 }
 
 =head2 indexer

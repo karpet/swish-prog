@@ -1,59 +1,4 @@
 package SWISH::Prog::Config;
-
-=head1 NAME
-
-SWISH::Prog::Config - read & write Swish-e config files
-
-=head1 SYNOPSIS
-
- use SWISH::Prog::Config;
- 
- my $config = SWISH::Prog::Config->new;
- 
- 
-=head1 DESCRIPTION
-
-The SWISH::Prog::Config class is intended to be accessed via SWISH::Prog new().
-
-See the Swish-e documentation for a list of configuration parameters.
-Each parameter has an accessor/mutator method as part of the Config object.
-Some preliminary compatability is offered for Swish::Config
-with XML format config files.
-
-B<NOTE:> Every config parameter can take either a scalar or an array ref as a value.
-In addition, you may append config values to any existing values by passing an additional
-true argument. The return value of any 'get' is always an array ref.
-
-Example:
-
- $config->MetaNameAlias( ['foo bar', 'one two', 'red yellow'] );
- $config->MetaNameAlias( 'green blue', 1 );
- print join("\n", @{ $config->MetaNameAlias }), " \n";
- # would print:
- # foo bar
- # one two
- # red yellow
- # green blue
- 
-
-
-=head1 METHODS
-
-NOTE this class inherits from Class::Accessor and not SWISH::Prog::Class.
-
-=head2 new( I<params> )
-
-Instatiate a new Config object. Takes a hash of key/value pairs, where each key
-may be a Swish-e configuration parameter.
-
-Example:
-
- my $config = SWISH::Prog::Config->new( DefaultContents => 'HTML*' );
- 
- print "DefaultContents is ", $config->DefaultContents, "\n";
- 
-=cut
-
 use strict;
 use warnings;
 use Carp;
@@ -167,6 +112,59 @@ my @Opts = qw(
 );
 
 __PACKAGE__->mk_accessors( qw( file debug verbose ), @Opts );
+
+=head1 NAME
+
+SWISH::Prog::Config - read/write Swish-e config files
+
+=head1 SYNOPSIS
+
+ use SWISH::Prog::Config;
+ 
+ my $config = SWISH::Prog::Config->new;
+ 
+ 
+=head1 DESCRIPTION
+
+The SWISH::Prog::Config class is intended to be accessed via SWISH::Prog new().
+
+See the Swish-e documentation for a list of configuration parameters.
+Each parameter has an accessor/mutator method as part of the Config object.
+Some preliminary compatability is offered for Swish::Config
+with XML format config files.
+
+B<NOTE:> Every config parameter can take either a scalar or an array ref as a value.
+In addition, you may append config values to any existing values by passing an additional
+true argument. The return value of any 'get' is always an array ref.
+
+Example:
+
+ $config->MetaNameAlias( ['foo bar', 'one two', 'red yellow'] );
+ $config->MetaNameAlias( 'green blue', 1 );
+ print join("\n", @{ $config->MetaNameAlias }), " \n";
+ # would print:
+ # foo bar
+ # one two
+ # red yellow
+ # green blue
+ 
+
+=head1 METHODS
+
+NOTE this class inherits from Class::Accessor and not SWISH::Prog::Class.
+
+=head2 new( I<params> )
+
+Instatiate a new Config object. Takes a hash of key/value pairs, where each key
+may be a Swish-e configuration parameter.
+
+Example:
+
+ my $config = SWISH::Prog::Config->new( DefaultContents => 'HTML*' );
+ 
+ print "DefaultContents is ", $config->DefaultContents, "\n";
+ 
+=cut
 
 sub new {
     my $class = shift;
@@ -476,8 +474,10 @@ __END__
 
 =head1 TODO
 
-IgnoreTotalWordCountWhenRanking defaults to 0 which is B<not> the default in Swish-e.
-This is to make the RankScheme feature work by default. Really, the default should be
+IgnoreTotalWordCountWhenRanking defaults to 0 
+which is B<not> the default in Swish-e.
+This is to make the RankScheme feature work by default. 
+Really, the default should be
 0 in Swish-e itself.
 
 =head1 SEE ALSO

@@ -90,8 +90,9 @@ sub init {
 
     # TODO get other MetaNames from config
     $self->{parser} = Search::QueryParser::SQL->new(
-        columns        => [qw( swishdefault )],
+        columns        => [qw( swishdefault swishtitle )],
         default_column => 'swishdefault',
+        strict         => 1,
     );
 
 }

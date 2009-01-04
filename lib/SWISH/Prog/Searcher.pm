@@ -3,6 +3,7 @@ use strict;
 use warnings;
 use base qw( SWISH::Prog::Class );
 use Carp;
+use Scalar::Util qw( blessed );
 use SWISH::Prog::QueryParser;
 
 our $VERSION = '0.24';
@@ -11,6 +12,7 @@ __PACKAGE__->mk_accessors(
     qw(
         query
         sort_order
+        max_hits
         query_class
         query_parser
         invindex
@@ -29,11 +31,13 @@ SWISH::Prog::Searcher - base searcher class
                     query_class     => 'SWISH::Prog::Query',
                     query_parser    => $swish_prog_queryparser,
                     config          => $swish_prog_config,
+                    max_hits        => 100,
+                    sort_order      => 'swishrank',
                 );
                 
  my $results = $searcher->search( 'foo bar' );
- while (my $hit = $results->next) {
-     printf("hit = %s\n", $hit->uri);
+ while (my $result = $results->next) {
+     printf("%4d %s\n", $result->score, $result->uri);
  }
 
 =head1 DESCRIPTION
@@ -55,9 +59,27 @@ sub init {
 
     # set defaults
     $self->{query_class} ||= 'SWISH::Prog::Query';
+
+    # set up invindex
     if ( !$self->{invindex} ) {
         croak "invindex required";
     }
+    if ( !blessed( $self->{invindex} ) ) {
+
+        # assume a InvIndex in the same base class as $self
+        my $class = ref($self);
+        $class =~ s/::Searcher$/::InvIndex/;
+        $self->{invindex}
+            = $class->new( path => $self->{invindex}, clobber => 0 );
+
+        #warn "new invindex in $class";
+
+    }
+    $self->{invindex}->open_ro;
+
+    # set up config
+    # TODO why do we need this?
+    # TODO read from invindex/swish.(xml|conf) ?
     if ( !$self->{config} ) {
         croak "config required";
     }
@@ -66,6 +88,8 @@ sub init {
         query_class => $self->{query_class},
         config      => $self->{config},
     );
+
+    $self->{max_hits} ||= 100;
 
     return $self;
 }

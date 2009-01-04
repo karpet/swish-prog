@@ -6,6 +6,7 @@ use base qw( SWISH::Prog::Class );
 use Carp;
 use Path::Class;
 use Scalar::Util qw( blessed );
+use SWISH::Prog::InvIndex::Meta;
 use overload(
     '""'     => sub { shift->path },
     fallback => 1,
@@ -23,8 +24,35 @@ sub init {
         $self->path( dir($path) );
     }
 
-    $self->{clobber} = 1 unless exists $self->{clobber};
+    $self->{clobber} = 0 unless exists $self->{clobber};
+}
 
+sub new_from_meta {
+    my $self = shift;
+
+    # open swish.xml meta file
+    my $meta = $self->meta;
+
+    # parse for index format
+    my $format = $meta->Index->{Format};
+
+    # create new object and re-set $self
+    my $newclass;
+    if ( $format eq 'Native' ) {
+        $newclass = 'SWISH::Prog::InvIndex::Native';
+    }
+    else {
+        $newclass = "SWISH::Prog::${format}::InvIndex";
+    }
+
+    warn "reblessing $self into $newclass";
+
+    eval "require $newclass";
+    croak $@ if $@;
+    return $newclass->new(
+        path    => $self->{path},
+        clobber => $self->{clobber},
+    );
 }
 
 sub open {
@@ -39,13 +67,23 @@ sub open {
     }
 
     if ( !-d $self->path ) {
+        carp "no path $self->{path} -- mkpath";
         $self->path->mkpath( $self->verbose );
     }
 
     1;
 }
 
+sub open_ro {
+    shift->open(@_);
+}
+
 sub close { 1; }
+
+sub meta {
+    my $self = shift;
+    return SWISH::Prog::InvIndex::Meta->new( invindex => $self );
+}
 
 =pod
 
@@ -84,12 +122,19 @@ information about the index.
 
 =head2 open
 
-Open the index for reading/writing. Subclasses should implement this per
+Open the invindex for reading/writing. Subclasses should implement this per
 their IR library specifics.
 
 This base open() method will rmtree( path() ) if clobber() is true,
 and will mkpath() if path() does not exist. So SUPER::open() should
 do something sane at minimum.
+
+=head2 open_ro
+
+Open the invindex in read-only mode. This is typical when searching
+the invindex.
+
+The default open_ro() method will simply call through to open().
 
 =head2 close
 

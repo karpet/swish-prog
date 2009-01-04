@@ -54,6 +54,7 @@ sub open {
     }
 
     if ( !-d $self->path ) {
+        carp "mkpath $self->{path}";
         $self->path->mkpath(1);
     }
 

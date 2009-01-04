@@ -5,12 +5,12 @@ use_ok('SWISH::Prog::Config');
 
 my %str = (
 
-    'foo bar'               => '',
-    'bar or foo'            => '',
-    '"foo bar"~10'          => '',
-    'foo not bar'           => '',
-    'title:foo or body:bar' => '',
-    '(foo AND bar) or quz'  => '',
+    'foo bar'                            => '',
+    'bar or foo'                         => '',
+    '"foo bar"~10'                       => '',
+    'foo not bar'                        => '',
+    'swishtitle:foo or swishdefault:bar' => '',
+    '(foo AND bar) or quz'               => '',
 
 );
 
