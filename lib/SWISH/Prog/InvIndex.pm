@@ -146,6 +146,11 @@ their IR library specifics.
 Get/set the boolean indicating whether the index should overwrite
 any existing index with the same name. The default is true.
 
+=head2 new_from_meta
+
+Returns a new instance like new() does, blessed into the appropriate
+class indicated by the C<swish.xml> meta header file.
+
 =cut
 
 1;

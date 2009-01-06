@@ -12,15 +12,15 @@ my $VERSION = '3.0.0';
 
 my $USAGE = qq{$0 
  usage:
-    swish [-e] [-i dir file ... ] [-S aggregator] [-c file] [-f invindex] [-l] [-v (num)]
-    swish -w word1 word2 ... [-f file1 file2 ...] \
+    swish3 [-e] [-i dir file ... ] [-S aggregator] [-c file] [-f invindex] [-l] [-v (num)]
+    swish3 -w word1 word2 ... [-f file1 file2 ...] \
           [-P phrase_delimiter] [-p prop1 ...] [-s sortprop1 [asc|desc] ...] \
           [-m num] [-t str] [-d delim] [-H (num)] [-x output_format] \
           [-R rank_scheme] [-L prop low high]
-    swish -k (char|*) [-f invindex1 invindex2 ...]
-    swish -M invindex1 invindex2 ... outputfile
-    swish -N /path/to/compare/file
-    swish -V
+    swish3 -k (char|*) [-f invindex1 invindex2 ...]
+    swish3 -M invindex1 invindex2 ... outputfile
+    swish3 -N /path/to/compare/file
+    swish3 -V
 
  options: defaults are in brackets
  # commented options are not yet supported
@@ -31,7 +31,7 @@ my $USAGE = qq{$0
     #-E : Append errors to file specified, or stderr if file not specified.
     #-e : "Economic Mode": The index proccess uses less RAM.
     -f : invindex dir to create or search from [index.swish]
-    -F : next param is invindex format
+    -F : next param is invindex format (ks, xapian, native, or dbi) [native]
     #-H : "Result Header Output": verbosity (0 to 9)  [1].
     -i : create an index from the specified files
         for "-S fs" - specify a list of files or directories
@@ -68,12 +68,13 @@ my $Opt = {
     verbose  => 0,
     Version  => 0,
     Debug    => 0,
-    config   => '',         #SWISH::Prog::Config->new
+    config   => '',              #SWISH::Prog::Config->new
     Warnings => 0,
     Source   => 'fs',
     Format   => 'native',
     query    => '',
     input    => 0,
+    folder   => 'index.swish',
 };
 
 my %allopts = (
@@ -85,6 +86,7 @@ my %allopts = (
     'Format=s'            => 'indexer type (native, ks, xapian, dbi)',
     'query|words=s'       => 'search query',
     'input'               => 'indexing mode',
+    'folder=s'            => 'invindex dir',
 );
 
 GetOptions( $Opt, keys %allopts ) or die $USAGE;
@@ -94,6 +96,7 @@ GetOptions( $Opt, keys %allopts ) or die $USAGE;
 if ( $Opt->{input} ) {
     $Opt->{indexer} = $Opt->{Format};
 }
+$Opt->{invindex} = $Opt->{folder};
 
 Data::Dump::dump $Opt;
 

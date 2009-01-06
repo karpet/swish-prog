@@ -219,7 +219,9 @@ sub invindex {
     if ( $self->aggregator ) {
         return $self->indexer->invindex;
     }
-    return $self->{invindex} || SWISH::Prog::InvIndex->new;
+    return blessed( $self->{invindex} )
+        ? $self->{invindex}
+        : SWISH::Prog::InvIndex->new( path => $self->{invindex} );
 }
 
 =head2 indexer
