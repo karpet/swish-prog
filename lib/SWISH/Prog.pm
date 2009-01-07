@@ -73,7 +73,7 @@ my %ashort = (
     object => 'SWISH::Prog::Aggregator::Object',
 );
 my %ishort = (
-    native => 'SWISH::Prog::Indexer::Native',
+    native => 'SWISH::Prog::Native::Indexer',
     xapian => 'SWISH::Prog::Xapian::Indexer',
     ks     => 'SWISH::Prog::KinoSearch::Indexer',
     dbi    => 'SWISH::Prog::DBI::Indexer',

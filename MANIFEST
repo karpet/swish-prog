@@ -5,9 +5,9 @@ lib/SWISH/Prog.pm
 lib/SWISH/Prog/Config.pm
 lib/SWISH/Prog/Headers.pm
 lib/SWISH/Prog/Indexer.pm
-lib/SWISH/Prog/Indexer/Native.pm
+lib/SWISH/Prog/Native/Indexer.pm
 lib/SWISH/Prog/InvIndex.pm
-lib/SWISH/Prog/InvIndex/Native.pm
+lib/SWISH/Prog/Native/InvIndex.pm
 lib/SWISH/Prog/InvIndex/Meta.pm
 lib/SWISH/Prog/Doc.pm
 lib/SWISH/Prog/Aggregator/DBI.pm

@@ -1,4 +1,4 @@
-package SWISH::Prog::InvIndex::Native;
+package SWISH::Prog::Native::InvIndex;
 use strict;
 use warnings;
 use Carp;
@@ -9,7 +9,17 @@ our $VERSION = '0.24';
 
 =head1 NAME
 
-SWISH::Prog::InvIndex::Native - the native Swish-e index format
+SWISH::Prog::Native::InvIndex - the native Swish-e index format
+
+=head1 SYNOPSIS
+
+ # see SWISH::Prog::InvIndex
+
+=head1 DESCRIPTION
+
+The Native InvIndex represents the index.swish-e files.
+
+=head1 METHODS
 
 =cut
 

@@ -1,10 +1,10 @@
-package SWISH::Prog::Indexer::Native;
+package SWISH::Prog::Native::Indexer;
 use strict;
 use warnings;
 use base qw( SWISH::Prog::Indexer );
 use Carp;
 use File::Temp ();
-use SWISH::Prog::InvIndex::Native;
+use SWISH::Prog::Native::InvIndex;
 use SWISH::Prog::Config;
 use Scalar::Util qw( blessed );
 
@@ -14,7 +14,31 @@ __PACKAGE__->mk_accessors(qw( fh exe opts ));
 
 =head1 NAME
 
-SWISH::Prog::Indexer::Native - wrapper around Swish-e binary
+SWISH::Prog::Native::Indexer - wrapper around Swish-e binary
+
+=head1 SYNOPSIS
+
+ use SWISH::Prog::Native::Indexer;
+ my $indexer = SWISH::Prog::Native::Indexer->new(
+        invindex    => SWISH::Prog::Native::InvIndex->new,
+        config      => SWISH::Prog::Config->new,
+        count       => 0,
+        clobber     => 1,
+        flush       => 10000,
+        started     => time()
+ );
+ $indexer->start;
+ for my $doc (@list_of_docs) {
+    $indexer->process($doc);
+ }
+ $indexer->finish;
+
+
+=head1 DESCRIPTION
+
+The Native Indexer is a wrapper around the swish-e version 2.x binary tool.
+
+=head1 METHODS
 
 =head2 new
 

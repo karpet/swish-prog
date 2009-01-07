@@ -37,18 +37,13 @@ sub new_from_meta {
     my $format = $meta->Index->{Format};
 
     # create new object and re-set $self
-    my $newclass;
-    if ( $format eq 'Native' ) {
-        $newclass = 'SWISH::Prog::InvIndex::Native';
-    }
-    else {
-        $newclass = "SWISH::Prog::${format}::InvIndex";
-    }
+    my $newclass = "SWISH::Prog::${format}::InvIndex";
 
     warn "reblessing $self into $newclass";
 
     eval "require $newclass";
     croak $@ if $@;
+
     return $newclass->new(
         path    => $self->{path},
         clobber => $self->{clobber},
