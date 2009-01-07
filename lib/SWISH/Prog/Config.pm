@@ -277,9 +277,8 @@ sub read2 {
     # filter include syntax to work with Config::General's
     $buf =~ s,IncludeConfigFile (.+?)\n,<<include $1>>\n,g;
 
-    my $dir = Path::Class::File->new($file)->parent;
+    my $dir = Path::Class::file($file)->parent;
 
-    # TODO are these the right opts?
     my $c = Config::General->new(
         -String          => $buf,
         -IncludeRelative => 1,
@@ -332,6 +331,23 @@ sub write2 {
     $self->file("$file");
 
     return $self->file;
+}
+
+=head2 write3( I<path/file> )
+
+Write config object to file in SWISH::3::Config XML format.
+
+=cut
+
+sub write3 {
+    my $self = shift;
+    my $file = shift or croak "file required";
+
+    write_file( "$file", $self->ver2_to_ver3 );
+
+    warn "wrote config file $file" if $self->debug;
+
+    return $self;
 }
 
 =head2 as_hash
@@ -399,22 +415,22 @@ sub _write_utf8 {
     print {$file} $buf;
 }
 
-=head2 ver2_to_xml( I<file> )
+=head2 ver2_to_ver3( I<file> )
 
 Utility method for converting Swish-e version 2 style config files
-to SWISH::Config XML style.
+to SWISH::3::Config XML style.
 
 Converts I<file> to XML format and returns as XML string.
 
 B<NOTE:> This API is liable to change as SWISH::Config is developed.
 
-  my $xmlconf = $config->ver2_to_xml( 'my/file.config' );
+  my $xmlconf = $config->ver2_to_ver3( 'my/file.config' );
 
 If I<file> is omitted, uses the current values in the calling object.
 
 =cut
 
-sub ver2_to_xml {
+sub ver2_to_ver3 {
     my $self = shift;
     my $file = shift;
 
@@ -443,26 +459,32 @@ sub ver2_to_xml {
     # TODO  what if this encoding is not correct?
     my $xml = <<EOF;
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- converted with SWISH::Prog::Config ver2_to_xml() $time -->
-<swishconfig>
+<!-- converted with SWISH::Prog::Config ver2_to_ver3() $time -->
+<swish>
+ <Index>
+  <Format>Native</Format>
+ </Index>
+ <!-- this feature is not yet fully supported -->
 EOF
 
-KEY: for my $k ( sort keys %$config ) {
-        my @args = ref $config->{$k} ? @{ $config->{$k} } : ( $config->{$k} );
+    #warn dump $config;
 
-    ARG: for my $arg (@args) {
-            $xml .= "  <$k";
-            if ( $takes_arg{$k} ) {
-                my ( $class, $v ) = ( $arg =~ m/^\ *(\S+)\ +(.+)$/ );
-                $arg = $v;
-                $xml .= ' type="' . $XMLer->utf8_safe($class) . '"';
-            }
-            $xml .= '>' . $XMLer->utf8_safe($arg) . "</$k>\n";
+#KEY: for my $k ( sort keys %$config ) {
+#        my @args = ref $config->{$k} ? @{ $config->{$k} } : ( $config->{$k} );
+#
+#    ARG: for my $arg (@args) {
+#            $xml .= "  <$k";
+#            if ( $takes_arg{$k} ) {
+#                my ( $class, $v ) = ( $arg =~ m/^\ *(\S+)\ +(.+)$/ );
+#                $arg = $v;
+#                $xml .= ' type="' . $XMLer->utf8_safe($class) . '"';
+#            }
+#            $xml .= '>' . $XMLer->utf8_safe($arg) . "</$k>\n";
+#
+#        }
+#    }
 
-        }
-    }
-
-    $xml .= "</swishconfig>\n";
+    $xml .= "</swish>\n";
 
     return $xml;
 
@@ -477,8 +499,7 @@ __END__
 IgnoreTotalWordCountWhenRanking defaults to 0 
 which is B<not> the default in Swish-e.
 This is to make the RankScheme feature work by default. 
-Really, the default should be
-0 in Swish-e itself.
+Really, the default should be 0 in Swish-e itself.
 
 =head1 SEE ALSO
 

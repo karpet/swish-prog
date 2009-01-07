@@ -8,6 +8,8 @@ lib/SWISH/Prog/Indexer.pm
 lib/SWISH/Prog/Native/Indexer.pm
 lib/SWISH/Prog/InvIndex.pm
 lib/SWISH/Prog/Native/InvIndex.pm
+lib/SWISH/Prog/Native/Searcher.pm
+lib/SWISH/Prog/Native/Result.pm
 lib/SWISH/Prog/InvIndex/Meta.pm
 lib/SWISH/Prog/Doc.pm
 lib/SWISH/Prog/Aggregator/DBI.pm

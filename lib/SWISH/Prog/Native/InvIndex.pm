@@ -55,7 +55,6 @@ ignored (always true).
 
 =cut
 
-# TODO open() with SWISH::API ??
 sub open {
     my $self = shift;
 
@@ -64,8 +63,9 @@ sub open {
     }
 
     if ( !-d $self->path ) {
-        carp "mkpath $self->{path}";
-        $self->path->mkpath(1);
+
+        #carp "mkpath $self->{path}";
+        $self->path->mkpath($self->verbose);
     }
 
     1;

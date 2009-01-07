@@ -15,6 +15,7 @@ my %required = (
     'File::Slurp'           => 0,         # Search::Tools also requires this
     'Search::QueryParser::SQL' => 0,
     'XML::Simple'           => 0,
+    'SWISH::API::Object'    => 0.12,      # native searcher requires
 );
 
 my %recommended = (

@@ -10,6 +10,8 @@ use Scalar::Util qw( blessed );
 
 our $VERSION = '0.24';
 
+my $invindex_class = 'SWISH::Prog::Native::InvIndex';
+
 __PACKAGE__->mk_accessors(qw( fh exe opts ));
 
 =head1 NAME
@@ -83,16 +85,14 @@ sub init {
     $self->{config} ||= SWISH::Prog::Config->new;
 
     # default index
-    $self->{invindex} ||= SWISH::Prog::InvIndex::Native->new;
+    $self->{invindex} ||= $invindex_class->new;
 
     if ( $self->{invindex} && !blessed( $self->{invindex} ) ) {
-        $self->{invindex}
-            = SWISH::Prog::InvIndex::Native->new( path => $self->{invindex} );
+        $self->{invindex} = $invindex_class->new( path => $self->{invindex} );
     }
 
-    unless ( $self->invindex->isa('SWISH::Prog::InvIndex::Native') ) {
-        croak ref($self)
-            . " requires SWISH::Prog::InvIndex::Native-derived object";
+    unless ( $self->invindex->isa($invindex_class) ) {
+        croak ref($self) . " requires $invindex_class-derived object";
     }
 
     $self->{exe} ||= 'swish-e';    # let PATH find it
@@ -210,9 +210,13 @@ sub finish {
 
     }
 
+    # write header
+    $self->config->write3(
+        $self->invindex->path->file('swish.xml')->stringify );
+
 }
 
-=head2 merge( @I<SWISH::Prog::Index::Native objects> )
+=head2 merge( @I<SWISH::Prog::Native::InvIndex objects> )
 
 merge() will merge @I<SWISH::Prog::Index::Native objects>
 together with the index named in the calling object.

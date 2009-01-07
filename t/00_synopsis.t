@@ -24,4 +24,7 @@ SKIP: {
 
     is( $program->count, 6, "indexed test docs" );
 
+    # clean up header so other test counts work
+    unlink('t/testindex/swish.xml') unless $ENV{PERL_DEBUG};
+
 }
