@@ -8,7 +8,7 @@ use Carp;
 use SWISH::Prog;
 use Getopt::Long qw(:config no_ignore_case);
 
-my $VERSION = '3.0.0';
+my $VERSION = '3.0.1';
 
 my $USAGE = qq{$0 
  usage:
@@ -24,7 +24,7 @@ my $USAGE = qq{$0
 
  options: defaults are in brackets
  # commented options are not yet supported
-    #-b : begin results at this number
+    -b : begin results at this number
     -c : configuration file(s) to use for indexing
     #-d : next param is delimiter.
     -D  : Debug mode
@@ -40,7 +40,7 @@ my $USAGE = qq{$0
     #-l : follow symbolic links when indexing
     #-L : Limit results to a range of property values
     #-M : merges index files
-    #-m : the maximum number of results to return [defaults to all results]
+    -m : the maximum number of results to return [defaults to all results]
     #-N : index only files with a modification date newer than path supplied
     #-P : next param is Phrase delimiter.
     #-p : include these document properties in the output "prop1 prop2 ..."
@@ -50,18 +50,18 @@ my $USAGE = qq{$0
         "fs" - index local files in your File System
         "spider" - index web site files using a web crawler
     The default value is: "fs"
-    -s : sort by these document properties in the output "prop1 prop2 ..."
+    #-s : sort by these document properties in the output "prop1 prop2 ..."
     #-T : Trace options ('-T help' for info)
     #-t : tags to search in - specify as a string
     #    "HBthec" - in Head|Body|title|header|emphasized|comments
     -V : prints the current version
     -v : indexing verbosity level (0 to 3) [-v 1]
     -w : search for words "word1 word2 ..."
-    #-W : next param is ParserWarnLevel [-W 2]
+    -W : next param is ParserWarnLevel [-W 2]
     #-x : "Extended Output Format": Specify the output format.
 
 version: $VERSION
- docs: http://swish-e.org
+ docs: http://swish-e.org/swish3/
 };
 
 my $Opt = {
@@ -69,12 +69,14 @@ my $Opt = {
     Version  => 0,
     Debug    => 0,
     config   => '',              #SWISH::Prog::Config->new
-    Warnings => 0,
+    Warnings => 2,
     Source   => 'fs',
     Format   => 'native',
     query    => '',
     input    => 0,
     folder   => 'index.swish',
+    begin    => 0,
+    max      => undef,
 };
 
 my %allopts = (
@@ -87,9 +89,17 @@ my %allopts = (
     'query|words=s'       => 'search query',
     'input'               => 'indexing mode',
     'folder=s'            => 'invindex dir',
+    'begin=i'             => 'begin results [0]',
+    'max=i'               => 'max results [all]',
+    'Version'             => 'print Version',
 );
 
 GetOptions( $Opt, keys %allopts ) or die $USAGE;
+
+if ( $Opt->{Version} ) {
+    print "$0 $VERSION\n";
+    exit;
+}
 
 #croak $USAGE unless @ARGV;
 
@@ -98,7 +108,9 @@ if ( $Opt->{input} ) {
 }
 $Opt->{invindex} = $Opt->{folder};
 
-Data::Dump::dump $Opt;
+$Opt->{debug} and Data::Dump::dump $Opt;
+
+$ENV{SWISH_WARNINGS} = $Opt->{Warnings};
 
 my $prog = SWISH::Prog->new(%$Opt);
 if ( $Opt->{input} ) {
@@ -108,17 +120,19 @@ elsif ( $Opt->{query} ) {
     my $invindex = $prog->invindex;
     my $meta     = $invindex->meta;
     my $format   = $meta->Index->{Format};
-    my $sclass
-        = $format eq 'Native'
-        ? 'SWISH::Prog::Searcher::Native'
-        : "SWISH::Prog::${format}::Searcher";
+    my $sclass   = "SWISH::Prog::${format}::Searcher";
     eval "require $sclass";
     croak $@ if $@;
     my $searcher = $sclass->new(
         invindex => $invindex->path . '',
         config   => $prog->config,
     );
-    my $results = $searcher->search( $Opt->{query} );
+    my $results = $searcher->search(
+        $Opt->{query},
+        {   start => $Opt->{begin},
+            max   => $Opt->{max},
+        }
+    );
 
     while ( my $result = $results->next ) {
         printf( qq{%4d %s "%s"\n},
@@ -141,7 +155,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008 by Peter Karman
+Copyright 2009 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
