@@ -87,4 +87,5 @@ Revision history for Perl extension Prog.
  
 0.25    xxx
         * added more features to example/swish3
-
+        * add missing test file to MANIFEST
+        * tests clean up after themselves wrt swish.xml header files
