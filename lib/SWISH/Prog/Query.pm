@@ -4,7 +4,7 @@ use warnings;
 use base qw( SWISH::Prog::Class );
 use Carp;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25_01';
 
 __PACKAGE__->mk_ro_accessors(qw( q parser ));
 

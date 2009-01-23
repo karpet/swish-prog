@@ -9,7 +9,7 @@ use Search::Tools::UTF8;
 use Search::QueryParser::SQL;
 use SWISH::Prog::Query;
 
-our $VERSION = '0.24';
+our $VERSION = '0.25_01';
 
 __PACKAGE__->mk_accessors(
     qw(

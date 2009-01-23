@@ -3,6 +3,8 @@ use Test::More tests => 5;
 use_ok('SWISH::Prog');
 use_ok('SWISH::Prog::Native::Indexer');
 
+diag("testing SWISH::Prog version $SWISH::Prog::VERSION");
+
 SKIP: {
 
     # is executable present?
