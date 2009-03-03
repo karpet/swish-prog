@@ -4,7 +4,7 @@ use warnings;
 use base qw( SWISH::Prog::Class );
 use Carp;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27_01';
 
 __PACKAGE__->mk_ro_accessors(qw( q parser ));
 
@@ -49,7 +49,36 @@ whenever the object is printed.
 
 sub stringify {
     my $self = shift;
-    return $self->q->stringify;
+    return $self->swish2;
+}
+
+=head2 swish2
+
+Returns query as Swish-e version 2.x-compatible string.
+
+=cut
+
+sub swish2 {
+    my $self = shift;
+    my $q    = $self->q;    # Search::QueryParser::SQL::Query object
+
+    # based on dbi() method in SQSQ class
+    # set flag temporarily
+    $q->{opts}->{delims} = 1;
+
+    my $sql = $q->_unwind;
+    my @values;
+    my $start   = chr(2);
+    my $end     = chr(3);
+    my $opstart = chr(5);
+    my $opend   = chr(6);
+
+    $sql =~ s/([\w\.]+)\ ?$opstart(!=)$opend/NOT $1=/g;
+    $sql =~ s/($start|$end|$opstart|$opend)//g;           # no ctrl chars
+
+    delete $q->{opts}->{delims};
+
+    return $sql;
 }
 
 1;

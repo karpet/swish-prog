@@ -13,7 +13,7 @@ use overload(
     fallback => 1,
 );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27_01';
 
 our $XMLer = Search::Tools::XML->new;
 
@@ -360,6 +360,28 @@ sub as_hash {
     my $self = shift;
     my $c = Config::General->new( -String => $self->stringify );
     return { $c->getall };
+}
+
+=head2 all_metanames
+
+Returns array ref of all MetaNames, regardless of whether they
+are declared as MetaNames, MetaNamesRank or MetaNameAlias config
+options.
+
+=cut
+
+sub all_metanames {
+    my $self = shift;
+    my @meta = @{ $self->MetaNames };
+    for my $line ( @{ $self->MetaNamesRank || [] } ) {
+        my ( $bias, @list ) = split( m/\ +/, $line );
+        push( @meta, @list );
+    }
+    for my $line ( @{ $self->MetaNameAlias || [] } ) {
+        my ( $orig, @alias ) = split( m/\ +/, $line );
+        push( @meta, @alias );
+    }
+    return \@meta;
 }
 
 =head2 stringify

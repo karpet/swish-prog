@@ -9,7 +9,7 @@ use Search::Tools::UTF8;
 use Search::QueryParser::SQL;
 use SWISH::Prog::Query;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27_01';
 
 __PACKAGE__->mk_accessors(
     qw(
@@ -85,12 +85,13 @@ sub init {
     $self->{wildcard}     ||= '*';
     $self->{stopwords}    ||= [];
     $self->{ignore_case} = 1 unless defined $self->{ignore_case};
-
     $self->{query_class} ||= 'SWISH::Prog::Query';
 
-    # TODO get other MetaNames from config
     $self->{parser} = Search::QueryParser::SQL->new(
-        columns        => [qw( swishdefault swishtitle )],
+        columns => [
+            qw( swishdefault swishtitle ),
+            @{ $self->{config}->all_metanames }
+        ],
         default_column => 'swishdefault',
         strict         => 1,
     );

@@ -8,7 +8,7 @@ use SWISH::Filter;
 use SWISH::Prog::Doc;
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.26';
+our $VERSION = '0.27_01';
 
 =pod
 

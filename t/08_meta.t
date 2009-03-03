@@ -1,5 +1,6 @@
-use Test::More tests => 4;
 use strict;
+use warnings;
+use Test::More tests => 4;
 
 use_ok('SWISH::Prog::InvIndex');
 

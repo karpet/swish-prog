@@ -5,7 +5,7 @@ use base qw( Class::Accessor::Fast );
 use Carp;
 use Data::Dump;
 
-our $VERSION = '0.26';
+our $VERSION = '0.27_01';
 
 __PACKAGE__->mk_accessors(qw( verbose debug warnings ));
 

@@ -1,3 +1,5 @@
+use strict;
+use warnings;
 use Test::More tests => 15;
 
 use_ok('SWISH::Prog::Native::Indexer');
