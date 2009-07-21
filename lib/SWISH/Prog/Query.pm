@@ -77,7 +77,7 @@ sub swish2 {
     $sql =~ s/($start|$end|$opstart|$opend)//g;           # no ctrl chars
 
     # standardize wildcard
-    my $w = $self->wildcard;
+    my $w = $self->{__qp}->wildcard;
     $sql =~ s/\%/$w/g;
 
     delete $q->{opts}->{delims};

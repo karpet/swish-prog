@@ -114,7 +114,11 @@ sub parse {
     $str = to_utf8($str);
     my $q = $self->{parser}->parse( $str, 1 )
         or croak $self->{parser}->err;
-    return $self->{query_class}->new( q => $q, parser => $self->{parser} );
+    return $self->{query_class}->new(
+        q      => $q,
+        parser => $self->{parser},
+        __qp   => $self,
+    );
 }
 
 1;
