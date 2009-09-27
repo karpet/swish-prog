@@ -113,7 +113,7 @@ sub crawl {
 }
 
 sub _addresses {
-    return join( ', ', map { $_->format } @_ );
+    return join( ', ', map { ref($_) ? $_->format : $_ } @_ );
 }
 
 sub _process_folder {
@@ -148,7 +148,7 @@ sub _filter_attachment {
 
     my $type     = $attm->body->mimeType->type;
     my $filename = $attm->body->dispositionFilename;
-    my $content  = $attm->decoded;
+    my $content  = $attm->decoded . '';  # force stringify
 
     if ( $self->swish_filter_obj->can_filter($type) ) {
 
@@ -187,6 +187,7 @@ sub get_doc {
     my $folder  = shift or croak "folder required";
     my $message = shift or croak "mail meta required";
 
+    # >head->createFromLine;
     my %meta = (
         url => join( '.', $folder, $message->messageId ),
         id  => $message->messageId,

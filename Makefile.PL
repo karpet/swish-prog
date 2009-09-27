@@ -1,7 +1,7 @@
 use ExtUtils::MakeMaker;
 
 my %required = (
-    'Search::Tools'         => '0.16',    # important version
+    'Search::Tools'         => '0.26',    # important version
     'File::Basename'        => 0,
     'MIME::Types'           => 0,
     'Path::Class'           => 0,
