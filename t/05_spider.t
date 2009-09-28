@@ -5,6 +5,7 @@ use Test::More tests => 3;
 SKIP: {
 
     if ( !$ENV{TEST_SPIDER} ) {
+        diag "set TEST_SPIDER env var to test the spider";
         skip "set TEST_SPIDER env var to test the spider", 3;
     }
 

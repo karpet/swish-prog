@@ -1,17 +1,10 @@
 package SWISH::Prog::Query;
 use strict;
 use warnings;
-use base qw( SWISH::Prog::Class );
+use base qw( Search::Tools::Query );
 use Carp;
 
 our $VERSION = '0.27_01';
-
-__PACKAGE__->mk_ro_accessors(qw( q parser ));
-
-use overload(
-    '""'     => \&stringify,
-    fallback => 1,
-);
 
 =head1 NAME
 
@@ -39,51 +32,7 @@ You create Query objects and pass them to a Searcher.
 
 =head1 METHODS
 
-
-=head2 stringify
-
-Turn the object back into string. This method is called
-whenever the object is printed.
-
 =cut
-
-sub stringify {
-    my $self = shift;
-    return $self->swish2;
-}
-
-=head2 swish2
-
-Returns query as Swish-e version 2.x-compatible string.
-
-=cut
-
-sub swish2 {
-    my $self = shift;
-    my $q    = $self->q;    # Search::QueryParser::SQL::Query object
-
-    # based on dbi() method in SQSQ class
-    # set flag temporarily
-    $q->{opts}->{delims} = 1;
-
-    my $sql = $q->_unwind;
-    my @values;
-    my $start   = chr(2);
-    my $end     = chr(3);
-    my $opstart = chr(5);
-    my $opend   = chr(6);
-
-    $sql =~ s/([\w\.]+)\ ?$opstart(!=)$opend/NOT $1=/g;
-    $sql =~ s/($start|$end|$opstart|$opend)//g;           # no ctrl chars
-
-    # standardize wildcard
-    my $w = $self->{__qp}->wildcard;
-    $sql =~ s/\%/$w/g;
-
-    delete $q->{opts}->{delims};
-
-    return $sql;
-}
 
 1;
 
@@ -93,13 +42,49 @@ __END__
 
 Peter Karman, E<lt>perl@peknet.comE<gt>
 
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SWISH-Prog>.  
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc SWISH::Prog
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/SWISH-Prog>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/SWISH-Prog>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/SWISH-Prog/>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2008 by Peter Karman
+Copyright 2008-2009 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself.
+it under the same terms as Perl itself. 
 
+=head1 SEE ALSO
 
-=cut
-
+L<http://swish-e.org/>

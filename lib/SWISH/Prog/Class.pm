@@ -1,13 +1,13 @@
 package SWISH::Prog::Class;
 use strict;
 use warnings;
-use base qw( Class::Accessor::Fast );
+use base qw( Search::Tools::Object );
 use Carp;
 use Data::Dump;
 
 our $VERSION = '0.27_01';
 
-__PACKAGE__->mk_accessors(qw( verbose debug warnings ));
+__PACKAGE__->mk_accessors(qw( verbose warnings ));
 
 =pod
 
@@ -52,19 +52,21 @@ Get/set flags affecting the verbosity of the program.
 
 =cut
 
-sub new {
-    my $class = shift;
-    my $opts  = ref( $_[0] ) ? $_[0] : {@_};
-    my $self  = $class->SUPER::new($opts);
+sub init {
+    my $self  = shift;
+    $self->SUPER::init(@_);
+#    my $class = shift;
+#    my $opts  = ref( $_[0] ) ? $_[0] : {@_};
+#    my $self  = $class->SUPER::new($opts);
     $self->{_start} = time();
-    unless ( exists $self->{debug} ) {
-        $self->{debug} = $ENV{PERL_DEBUG} || 0;
-    }
-    $self->init;
+#    unless ( exists $self->{debug} ) {
+#        $self->{debug} = $ENV{PERL_DEBUG} || 0;
+#    }
+#    $self->init;
     return $self;
 }
 
-sub init { }
+#sub init { }
 
 =head2 elapsed
 
@@ -101,11 +103,49 @@ __END__
 
 Peter Karman, E<lt>perl@peknet.comE<gt>
 
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SWISH-Prog>.  
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc SWISH::Prog
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/SWISH-Prog>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/SWISH-Prog>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/SWISH-Prog/>
+
+=back
+
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2008 by Peter Karman
+Copyright 2008-2009 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself. 
 
-=cut
+=head1 SEE ALSO
+
+L<http://swish-e.org/>
