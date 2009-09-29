@@ -4,7 +4,7 @@ use warnings;
 use base qw( Search::Tools::Query );
 use Carp;
 
-our $VERSION = '0.27_01';
+our $VERSION = '0.27';
 
 =head1 NAME
 

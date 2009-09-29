@@ -6,7 +6,7 @@ use base qw( SWISH::Prog::Class );
 __PACKAGE__->mk_accessors(
     qw( swishdocpath swishlastmodified swishtitle swishdescription swishrank ));
 
-our $VERSION = '0.27_01';
+our $VERSION = '0.27';
 
 =head1 NAME
 
