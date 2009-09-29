@@ -9,7 +9,8 @@ use Mail::Box::Manager;
 use base qw( SWISH::Prog::Aggregator );
 
 our $VERSION = '0.27_01';
-our $XMLer   = Search::Tools::XML->new;
+
+my $XMLer = Search::Tools::XML->new();
 
 =pod
 

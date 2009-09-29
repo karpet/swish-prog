@@ -46,6 +46,11 @@ sub init {
     $self->{cache} ||= {};
 }
 
+=head2 cache([ I<hash_ref> ])
+
+Get/set the internal in-memory cache. The default is just a hash ref.
+Subclasses are encouraged to implement their own storage.
+
 =head2 has( I<key> )
 
 Does I<key> exist in cache.

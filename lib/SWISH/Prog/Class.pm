@@ -1,13 +1,13 @@
 package SWISH::Prog::Class;
 use strict;
 use warnings;
-use base qw( Search::Tools::Object );
+use base qw( Rose::ObjectX::CAF );
 use Carp;
-use Data::Dump;
+use Data::Dump qw( dump );
 
 our $VERSION = '0.27_01';
 
-__PACKAGE__->mk_accessors(qw( verbose warnings ));
+__PACKAGE__->mk_accessors(qw( debug verbose warnings ));
 
 =pod
 
@@ -53,20 +53,12 @@ Get/set flags affecting the verbosity of the program.
 =cut
 
 sub init {
-    my $self  = shift;
+    my $self = shift;
     $self->SUPER::init(@_);
-#    my $class = shift;
-#    my $opts  = ref( $_[0] ) ? $_[0] : {@_};
-#    my $self  = $class->SUPER::new($opts);
+    $self->{debug} = $ENV{PERL_DEBUG} || 0;
     $self->{_start} = time();
-#    unless ( exists $self->{debug} ) {
-#        $self->{debug} = $ENV{PERL_DEBUG} || 0;
-#    }
-#    $self->init;
     return $self;
 }
-
-#sub init { }
 
 =head2 elapsed
 
@@ -80,20 +72,10 @@ sub elapsed {
 
 =head2 dump( [I<data>] )
 
-Returns $self or I<data> (if present) via Data::Dump::dump. Useful for peering
+Returns $self (and I<data> if present) via Data::Dump::dump. Useful for peering
 inside an object or other scalar.
 
 =cut
-
-sub dump {
-    my $self = shift;
-    if (@_) {
-        Data::Dump::dump( \@_ );
-    }
-    else {
-        Data::Dump::dump($self);
-    }
-}
 
 1;
 

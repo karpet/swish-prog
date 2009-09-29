@@ -27,7 +27,7 @@ SWISH::Prog::Native::Indexer - wrapper around Swish-e binary
         count       => 0,
         clobber     => 1,
         flush       => 10000,
-        started     => time()
+        started     => time(),
  );
  $indexer->start;
  for my $doc (@list_of_docs) {
@@ -67,6 +67,10 @@ Takes same args as C<swish-e -v> option.
 =item warnings
 
 Takes same args as C<swish-e -W> option.
+
+=item opts
+
+String of options passed directly to the swish-e program.
 
 =back
 

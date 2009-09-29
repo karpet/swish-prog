@@ -34,10 +34,6 @@ shared by many classes in the SWISH::Prog project.
 
 Regular expression of common file type extensions.
 
-=item $XML
-
-Instance of Search::Tools::XML.
-
 =item %ParserTypes
 
 Hash of MIME types to their equivalent parser.
@@ -46,9 +42,7 @@ Hash of MIME types to their equivalent parser.
 
 =cut
 
-our $ExtRE = qr{(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3)(\.gz)?}io;
-our $XML   = Search::Tools::XML->new;
-
+our $ExtRE       = qr{(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3)(\.gz)?}io;
 our %ParserTypes = (
 
     # mime                  parser type
@@ -64,6 +58,7 @@ our %ParserTypes = (
 
 my %ext2mime = ();    # cache to avoid hitting MIME::Type each time
 my $mime_types = MIME::Types->new;
+my $XML        = Search::Tools::XML->new;
 
 =head1 METHODS
 
@@ -124,7 +119,8 @@ sub perl_to_xml {
     }
 
     if ( !ref $perl ) {
-        return $XML->start_tag($root)
+        return
+              $XML->start_tag($root)
             . $XML->utf8_safe($perl)
             . $XML->end_tag($root);
     }

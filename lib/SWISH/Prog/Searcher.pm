@@ -48,8 +48,34 @@ returning results from a SWISH::Prog::InvIndex.
 
 =head1 METHODS
 
-
 =head2 init
+
+Overrides base method.
+
+=head2 config
+
+A SWISH::Prog::Config object. Required. Set in new().
+
+=head2 invindex
+
+A SWISH::Prog::InvIndex object or directory path. Required. Set in new().
+
+=head2 max_hits
+
+The maximum number of hits to return. Optional. Default is 1000.
+
+=head2 query_class
+
+Default is C<SWISH::Prog::Query>.
+
+=head2 query_parser
+
+A SWISH::Prog::QueryParser object. Optional. Set in new().
+
+=head2 sort_order
+
+The order in which Results will be sorted. Default is descending
+by C<swishrank>.
 
 =cut
 
@@ -66,7 +92,7 @@ sub init {
     }
     if ( !blessed( $self->{invindex} ) ) {
 
-        # assume a InvIndex in the same base class as $self
+        # assume a InvIndex in the same namespace as $self
         my $class = ref($self);
         $class =~ s/::Searcher$/::InvIndex/;
         $self->{invindex}
@@ -89,7 +115,7 @@ sub init {
         config      => $self->{config},
     );
 
-    $self->{max_hits} ||= 100;
+    $self->{max_hits} ||= 1000;
 
     return $self;
 }

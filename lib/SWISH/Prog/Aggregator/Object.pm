@@ -14,7 +14,8 @@ __PACKAGE__->mk_accessors(
     qw( methods class title url modtime class_meta serial_format ));
 
 our $VERSION = '0.27_01';
-our $XMLer   = $SWISH::Prog::Utils::XML;
+
+my $XMLer = Search::Tools::XML->new(); # included in Utils
 
 =pod
 
@@ -129,7 +130,7 @@ sub init {
     $self->{title}         ||= 'title';
     $self->{url}           ||= 'url';
     $self->{modtime}       ||= 'modtime';
-    $self->{serial_format} ||= 'json'; 
+    $self->{serial_format} ||= 'json';
 
     unless ( $self->{methods} ) {
         croak "methods required";

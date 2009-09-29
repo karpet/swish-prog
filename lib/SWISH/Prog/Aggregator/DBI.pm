@@ -8,10 +8,11 @@ use Data::Dump qw( dump );
 use DBI;
 use SWISH::Prog::Utils;
 
-__PACKAGE__->mk_accessors(qw( db title alias_columns schema ));
+__PACKAGE__->mk_accessors(qw( db alias_columns schema ));
 
 our $VERSION = '0.27_01';
-our $XMLer   = $SWISH::Prog::Utils::XML;
+
+my $XMLer = Search::Tools::XML->new(); # included in Utils
 
 =pod
 
@@ -46,8 +47,8 @@ SWISH::Prog::Aggregator::DBI - index DB records with Swish-e
                swishtitle       => 'title',
           }
         }
-        alias_columns => 1,
-        indexer => SWISH::Prog::Indexer::Native->new
+        alias_columns   => 1,
+        indexer         => SWISH::Prog::Indexer::Native->new,
     );
     
     $aggregator->crawl();
@@ -193,7 +194,7 @@ sub init {
             'swishdefault '
                 . join( ' ',
                 map { '_' . $_ . '_row' }
-                    sort keys %{ $self->{schema} } ),
+                sort keys %{ $self->{schema} } ),
             1    # always append
         );
     }

@@ -1,15 +1,11 @@
 package SWISH::Prog::Doc;
-
 use strict;
 use warnings;
 use Carp;
 use base qw( SWISH::Prog::Class );
-
-use POSIX qw(locale_h);
-use locale;
-
 use overload(
     '""'     => \&as_string,
+    'bool'   => sub {1},
     fallback => 1,
 );
 
@@ -17,11 +13,20 @@ use SWISH::Prog::Headers;
 
 our $VERSION = '0.27_01';
 
-my @Attr = qw( url modtime type parser content action size charset data );
-__PACKAGE__->mk_accessors(@Attr);
-my $locale = setlocale(LC_CTYPE);
-my ( $lang, $charset ) = split( m/\./, $locale );
-$charset ||= 'iso-8859-1';
+__PACKAGE__->mk_accessors(
+    qw( url modtime type parser content action size charset data ));
+
+my ( $locale, $lang, $charset );
+{
+
+    # inside a block to reduce impact on any regex
+    use POSIX qw(locale_h);
+    use locale;
+
+    $locale = setlocale(LC_CTYPE);
+    ( $lang, $charset ) = split( m/\./, $locale );
+    $charset ||= 'iso-8859-1';
+}
 
 =pod
 
@@ -92,6 +97,8 @@ All of the following params are also available as accessors/mutators.
 =item debug
 
 =item charset
+
+=item data
 
 =back
 

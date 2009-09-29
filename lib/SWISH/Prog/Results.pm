@@ -37,11 +37,9 @@ returning results from a SWISH::Prog::InvIndex.
 
 =head1 METHODS
 
-=cut
+=head2 hits
 
-=head2 init
-
-=cut
+Returns the number of matching documents for the query.
 
 =head2 next
 

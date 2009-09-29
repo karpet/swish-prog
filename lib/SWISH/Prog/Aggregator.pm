@@ -10,6 +10,10 @@ use Scalar::Util qw( blessed );
 
 our $VERSION = '0.27_01';
 
+__PACKAGE__->mk_accessors(
+    qw( set_parser_from_type indexer doc_class swish_filter_obj ));
+__PACKAGE__->mk_ro_accessors(qw( config count ));
+
 =pod
 
 =head1 NAME
@@ -53,12 +57,6 @@ of aggregators that crawl the filesystem and web, respectively.
 
 =head1 METHODS
 
-=cut
-
-__PACKAGE__->mk_accessors(
-    qw( set_parser_from_type indexer doc_class swish_filter_obj ));
-__PACKAGE__->mk_ro_accessors(qw( config count ));
-
 =head2 init
 
 Set object flags per SWISH::Prog::Class API. These are also accessors, 
@@ -79,6 +77,10 @@ A SWISH::Prog::Indexer object.
 
 The name of the SWISH::Prog::Doc-derived class to use in get_doc().
 Default is SWISH::Prog::Doc.
+
+=item swish_filter_obj
+
+A SWISH::Filter object. If not passed in new() one is created for you.
 
 =back
 
@@ -103,7 +105,7 @@ sub init {
         croak "SWISH::Prog::Config-derived object required";
     }
 
-    $self->{doc_class}        ||= 'SWISH::Prog::Doc';
+    $self->{doc_class} ||= 'SWISH::Prog::Doc';
     $self->{swish_filter_obj} ||= SWISH::Filter->new;
 
     if ( $self->{filter} ) {

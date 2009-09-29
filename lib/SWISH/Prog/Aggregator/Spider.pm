@@ -3,14 +3,14 @@ use strict;
 use warnings;
 use base qw( SWISH::Prog::Aggregator );
 use Carp;
-__PACKAGE__->mk_accessors(
-    qw( use_md5 uri_cache md5_cache queue ua max_depth delay timeout ));
-__PACKAGE__->mk_ro_accessors(qw( current_depth base ));
 use Scalar::Util qw( blessed );
 use URI;
 use SWISH::Prog::Queue;
 use SWISH::Prog::Cache;
 use SWISH::Prog::Aggregator::Spider::UA;
+
+__PACKAGE__->mk_accessors(
+    qw( use_md5 uri_cache md5_cache queue ua max_depth delay timeout ));
 
 #use LWP::Debug qw(+);
 
@@ -85,6 +85,11 @@ of links from the first argument passed to I<crawl>.
 Get/set the number of seconds to wait between making requests. Default is
 5 seconds (a very friendly delay).
 
+=item timeout
+
+Get/set the number of seconds to wait before considering the remote
+server unresponsive. The default is 10.
+
 =back
 
 =head2 init
@@ -115,7 +120,7 @@ sub init {
     $self->{timeout} = 10 unless defined $self->{timeout};
     $self->{ua}->timeout( $self->{timeout} );
 
-    $self->{current_depth} ||= 1;
+    $self->{_current_depth} = 1;
 
     if ( $self->{use_md5} ) {
         eval "require Digest::MD5" or croak $@;
@@ -141,7 +146,7 @@ sub uri_ok {
     #warn "uri_ok: $str\n";
 
     # check base
-    if ( $uri->rel( $self->{base} ) eq $uri ) {
+    if ( $uri->rel( $self->{_base} ) eq $uri ) {
         return 0;
     }
 
@@ -157,7 +162,7 @@ sub _add_links {
 
     # calc depth
     if ( !$self->{_parent} || $self->{_parent} ne $parent ) {
-        $self->{current_depth}++;
+        $self->{_current_depth}++;
     }
 
     $self->{_parent} ||= $parent;    # first time.
@@ -168,7 +173,7 @@ sub _add_links {
         next if $self->uri_cache->has($uri);    # check only once
 
         if ( $self->uri_ok($uri) ) {
-            $self->uri_cache->add( $uri => $self->current_depth );
+            $self->uri_cache->add( $uri => $self->{_current_depth} );
             $self->queue->put($uri);
         }
     }
@@ -415,7 +420,7 @@ sub crawl {
         my $uri = URI->new($url);
         $self->uri_cache->add( $uri => 1 );
         $self->queue->put($uri);
-        $self->{base} = $uri->canonical->as_string;
+        $self->{_base} = $uri->canonical->as_string;
         while ( my $doc = $self->get_doc ) {
             next unless blessed($doc);
             $self->{count}++;

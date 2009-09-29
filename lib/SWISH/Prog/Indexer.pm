@@ -44,6 +44,30 @@ IR backend library.
 
 Constructor. See the SYNOPSIS for default options.
 
+I<params> may include the following keys, each of which is also an
+accessor method:
+
+=over
+
+=item clobber
+
+Overrite any existing InvIndex.
+
+=item config
+
+A SWISH::Prog::Config object.
+
+=item flush
+
+The number of indexed docs at which in-memory changes 
+should be written to disk.
+
+=item invindex
+
+A SWISH::Prog::InvIndex object.
+
+=back
+
 =head2 start
 
 Opens the invindex() objet and sets the started() time to time().
@@ -89,6 +113,17 @@ sub finish {
     my $self = shift;
     $self->invindex->close;
 }
+
+=head2 count
+
+Returns the number of documents processed.
+
+=head2 started
+
+The time at which the Indexer object was created. Returns a Unix epoch
+integer.
+
+=cut
 
 1;
 

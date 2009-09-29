@@ -29,6 +29,14 @@ returning results from a SWISH::Prog::InvIndex.
 
 The following methods are all accessors (getters) only.
 
+=head2 doc
+
+Returns a SWISH::Prog::Doc instance.
+
+=head2 score
+
+Returns the ranking score for the Result.
+
 =head2 uri
 
 =head2 mtime

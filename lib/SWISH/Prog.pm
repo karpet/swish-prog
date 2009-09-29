@@ -1,6 +1,5 @@
 package SWISH::Prog;
-
-use 5.008_003;
+use 5.008003;
 use strict;
 use warnings;
 use base qw( SWISH::Prog::Class );
@@ -167,6 +166,10 @@ sub init {
 
     $self->{aggregator} = $aggregator;
 }
+
+=head2 aggregator( I<$swish_prog_aggregator> )
+
+Get the SWISH::Prog::Aggregator object. You should set this in new().
 
 =head2 run( I<collection> )
 

@@ -12,20 +12,20 @@ if ( $MM_Version =~ /_/ )    # dev version
 }
 
 my %required = (
-    'Search::Tools'            => '0.27',
-    'File::Basename'           => 0,
-    'MIME::Types'              => 0,
-    'Path::Class'              => 0,
-    'SWISH::Filter'            => '0.09',
-    'Class::Accessor::Fast'    => 0,
-    'File::Temp'               => 0,
-    'Data::Dump'               => 0,
-    'Config::General'          => '2.31',
-    'Scalar::Util'             => 0,
-    'Test::More'               => 0,
-    'File::Slurp'              => 0,        # Search::Tools also requires this
-    'XML::Simple'              => 0,
-    'SWISH::API::Object'       => 0.12,     # native searcher requires
+    'Search::Tools'      => '0.27',
+    'File::Basename'     => 0,
+    'MIME::Types'        => 0,
+    'Path::Class'        => 0,
+    'SWISH::Filter'      => '0.09',
+    'Rose::ObjectX::CAF' => 0,        # Search::Tools also requires this
+    'File::Temp'         => 0,
+    'Data::Dump'         => 0,        # Search::Tools also requires this
+    'Config::General'    => '2.31',
+    'Scalar::Util'       => 0,
+    'Test::More'         => 0,
+    'File::Slurp'        => 0,        # Search::Tools also requires this
+    'XML::Simple'        => 0,
+    'SWISH::API::Object' => 0.12,     # native searcher requires
 );
 
 my %recommended = (

@@ -45,6 +45,10 @@ sub init {
 
 }
 
+=head2 file
+
+Returns a Path::Class::File object representing the main index file.
+
 =head2 open
 
 Creates path() if not already existent.

@@ -45,6 +45,16 @@ Alias for swishdescription().
 
 Alias for swishrank().
 
+=head2 swishdocpath 
+
+=head2 swishlastmodified 
+
+=head2 swishtitle 
+
+=head2 swishdescription 
+
+=head2 swishrank
+
 =cut
 
 sub uri     { shift->swishdocpath }
