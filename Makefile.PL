@@ -25,7 +25,6 @@ my %required = (
     'Test::More'         => 0,
     'File::Slurp'        => 0,        # Search::Tools also requires this
     'XML::Simple'        => 0,
-    'SWISH::API::Object' => 0.12,     # native searcher requires
 );
 
 my %recommended = (
@@ -33,7 +32,7 @@ my %recommended = (
     'File::Find'     => 0,    # should be part of base install just like Carp
     'WWW::Mechanize' => 0,
     'URI'            => 0,
-
+    'SWISH::API::Object' => 0.12,    # native searcher requires
 );
 
 my %optional = (
