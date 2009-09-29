@@ -8,6 +8,7 @@ SKIP: {
 
     eval "use SWISH::Prog::Aggregator::Mail";
     if ($@) {
+        diag "install Mail::Box to test Mail aggregator";
         skip "mail test requires Mail::Box", 4;
     }
 
