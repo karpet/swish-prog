@@ -42,7 +42,8 @@ Hash of MIME types to their equivalent parser.
 
 =cut
 
-our $ExtRE       = qr{(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3)(\.gz)?}io;
+our $ExtRE
+    = qr{(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3|css|ico|js|php)(\.gz)?}io;
 our %ParserTypes = (
 
     # mime                  parser type
@@ -56,7 +57,12 @@ our %ParserTypes = (
     'default'            => 'HTML*',
 );
 
-my %ext2mime = ();    # cache to avoid hitting MIME::Type each time
+# cache to avoid hitting MIME::Type each time
+my %ext2mime = ();
+
+# prime the cache with some typical defaults that MIME::Type won't match.
+$ext2mime{'php'} = 'text/html';
+
 my $mime_types = MIME::Types->new;
 my $XML        = Search::Tools::XML->new;
 
@@ -74,6 +80,9 @@ sub mime_type {
     my $self = shift;
     my $url  = shift or return;
     my $ext  = shift || ( $self->path_parts($url) )[2];
+    $ext ||= 'html';
+
+    #warn "$url => $ext";
     if ( !exists $ext2mime{$ext} ) {
 
         # cache the mime type as a string

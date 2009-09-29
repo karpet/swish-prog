@@ -5,6 +5,7 @@ use base qw( SWISH::Prog::Aggregator );
 use Carp;
 use Scalar::Util qw( blessed );
 use URI;
+use SWISH::Prog::Utils;
 use SWISH::Prog::Queue;
 use SWISH::Prog::Cache;
 use SWISH::Prog::Aggregator::Spider::UA;
@@ -15,6 +16,11 @@ __PACKAGE__->mk_accessors(
 #use LWP::Debug qw(+);
 
 our $VERSION = '0.27_01';
+
+# TODO make these configurable
+my %parser_types = %SWISH::Prog::Utils::ParserTypes;
+my $default_ext  = $SWISH::Prog::Utils::ExtRE;
+my $utils        = 'SWISH::Prog::Utils';
 
 =pod
 
@@ -113,7 +119,8 @@ sub init {
 
     $self->{queue}     ||= SWISH::Prog::Queue->new;
     $self->{uri_cache} ||= SWISH::Prog::Cache->new;
-    $self->{_auth_cache} = SWISH::Prog::Cache->new;    # ALWAYS inmemory cache
+    $self->{_uri_ok_cache} = SWISH::Prog::Cache->new;
+    $self->{_auth_cache}   = SWISH::Prog::Cache->new;  # ALWAYS inmemory cache
     $self->{ua}
         ||= SWISH::Prog::Aggregator::Spider::UA->new( stack_depth => 0 );
 
@@ -142,11 +149,22 @@ sub uri_ok {
     my $self = shift;
     my $uri  = shift or croak "URI required";
     my $str  = $uri->canonical->as_string;
+    return 0 if $self->{_uri_ok_cache}->has($str);
+    $self->{_uri_ok_cache}->add($str);
 
     #warn "uri_ok: $str\n";
 
     # check base
     if ( $uri->rel( $self->{_base} ) eq $uri ) {
+        return 0;
+    }
+
+    my $path = $uri->path;
+    my $mime = $utils->mime_type($path);
+
+    if ( !exists $parser_types{$mime} ) {
+
+        #warn "no parser for $mime";
         return 0;
     }
 
@@ -171,9 +189,9 @@ sub _add_links {
         my $uri = $l->url_abs or next;
 
         next if $self->uri_cache->has($uri);    # check only once
+        $self->uri_cache->add( $uri => $self->{_current_depth} );
 
         if ( $self->uri_ok($uri) ) {
-            $self->uri_cache->add( $uri => $self->{_current_depth} );
             $self->queue->put($uri);
         }
     }
@@ -374,6 +392,10 @@ sub get_doc {
 
     if ( $ua->success ) {
 
+        my $content_type = $meta->{ct};
+        if ( !exists $parser_types{$content_type} ) {
+            warn "no parser for $content_type";
+        }
         my $charset = $headers->content_type;
         $charset =~ s/;?$meta->{ct};?//;
         my %doc = (

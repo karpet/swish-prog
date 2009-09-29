@@ -11,11 +11,11 @@ use SWISH::Prog::Utils;
 use Scalar::Util qw( blessed );
 
 __PACKAGE__->mk_accessors(
-    qw( methods class title url modtime class_meta serial_format ));
+    qw( methods class title url modtime serial_format ));
 
 our $VERSION = '0.27_01';
 
-my $XMLer = Search::Tools::XML->new(); # included in Utils
+my $XMLer = Search::Tools::XML->new();    # included in Utils
 
 =pod
 
@@ -140,7 +140,7 @@ sub init {
     my $config = $self->{indexer}->{config};
 
     ( my $class_meta = $self->class ) =~ s/\W/\./g;
-    $self->class_meta($class_meta);
+    $self->{_class_meta} = $class_meta;
 
     # make urls find-able (really should adjust WordCharacters too...)
     $config->MaxWordLimit(256) unless $config->MaxWordLimit;
@@ -245,7 +245,7 @@ sub get_doc {
         ? $object->$modtimemeth
         : time();
 
-    my $xml = $self->_obj2xml( $self->class_meta, $object, $title );
+    my $xml = $self->_obj2xml( $self->{_class_meta}, $object, $title );
 
     my $doc = $self->doc_class->new(
         content => $xml,
