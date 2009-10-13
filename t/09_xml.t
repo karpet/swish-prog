@@ -28,8 +28,8 @@ my $data1 = {
     },
 };
 
-my $expect_data1_xml
-    = "<data1><hash><three>3</three><four>4</four></hash><array><array>one</array><array>1</array><array>two</array><array>2</array></array><foo>bar</foo></data1>";
+my $expect_data1_xml =
+    qq{<data1><hash><three>3</three><four>4</four></hash><array><array>one</array><array>1</array><array>two</array><array>2</array></array><foo>bar</foo></data1>};
 
 ok( my $data1_xml = $utils->perl_to_xml( $data1, 'data1' ), "data1 to xml" );
 is( $data1_xml, $expect_data1_xml, "data1 xml" );
@@ -49,7 +49,7 @@ my $data2 = {
 };
 
 my $expected_data2_xml
-    = "<data2><arrays><array><three>3</three><two>2</two></array><array><five>5</five><four>4</four></array></arrays></data2>";
+    = qq{<data2><arrays count="2"><array><three>3</three><two>2</two></array><array><five>5</five><four>4</four></array></arrays></data2>};
 
 # exercise $strip_plural
 ok( my $data2_xml = $utils->perl_to_xml( $data2, 'data2', 1 ),

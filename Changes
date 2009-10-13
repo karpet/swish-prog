@@ -105,4 +105,6 @@ Revision history for Perl extension Prog.
 
 0.29   xxx
         * add strip_plural option to Utils->perl_to_xml()
+        * add count attribute to arrayref values of hashrefs in perl_to_xml()
+
 

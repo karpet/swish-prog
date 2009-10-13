@@ -223,10 +223,12 @@ sub _hash_to_xml {
         my $thing = $perl->{$key};
         if ( ref $thing ) {
             my $key_to_pass = $key;
+            my %attr;
             if ( ref $thing eq 'ARRAY' && $strip_plural ) {
-                $key_to_pass =~ s/s$//;
+                $key_to_pass =~ s/s$//i;
+                $attr{count} = scalar @$thing;
             }
-            $$xml_ref .= $XML->start_tag($key);
+            $$xml_ref .= $XML->start_tag($key, \%attr);
             $self->_ref_to_xml( $thing, $key_to_pass, $xml_ref );
             $$xml_ref .= $XML->end_tag($key);
 
