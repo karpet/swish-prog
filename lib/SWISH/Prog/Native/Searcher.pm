@@ -47,6 +47,18 @@ sub init {
     return $self;
 }
 
+=head2 sao_opts( I<array_ref> )
+
+Options to pass to SWISH::API::Object in new().
+
+=head2 result_class( I<class_name> )
+
+Passed to SWISH::API::Object in new().
+
+=head2 swish
+
+The SWISH::API::Object instance.
+
 =head2 search( I<query> )
 
 Calls the query() method on the internal SWISH::API::Object.
