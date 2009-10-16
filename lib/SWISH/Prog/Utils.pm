@@ -210,7 +210,7 @@ sub _array_to_xml {
         if ( ref $thing and length($root) ) {
             $$xml_ref .= $XML->start_tag($root);
         }
-        $self->_ref_to_xml( $thing, $root, $xml_ref );
+        $self->_ref_to_xml( $thing, $root, $xml_ref, $strip_plural );
         if ( ref $thing and length($root) ) {
             $$xml_ref .= $XML->end_tag($root);
         }
@@ -228,14 +228,15 @@ sub _hash_to_xml {
                 $key_to_pass =~ s/s$//i;
                 $attr{count} = scalar @$thing;
             }
-            $$xml_ref .= $XML->start_tag($key, \%attr);
-            $self->_ref_to_xml( $thing, $key_to_pass, $xml_ref );
+            $$xml_ref .= $XML->start_tag( $key, \%attr );
+            $self->_ref_to_xml( $thing, $key_to_pass, $xml_ref,
+                $strip_plural );
             $$xml_ref .= $XML->end_tag($key);
 
             #$$xml_ref .= "\n";                  # just for debugging
         }
         else {
-            $self->_ref_to_xml( $thing, $key, $xml_ref );
+            $self->_ref_to_xml( $thing, $key, $xml_ref, $strip_plural );
         }
     }
 }
