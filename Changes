@@ -106,5 +106,6 @@ Revision history for Perl extension Prog.
 0.29   xxx
         * add strip_plural option to Utils->perl_to_xml()
         * add count attribute to arrayref values of hashrefs in perl_to_xml()
-
+        * fix method/param name strictness bug revealed by Rose::ObjectX::CAF 0.03. 
+          This mostly required internal param name changes to official method names.
 
