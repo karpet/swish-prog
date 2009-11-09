@@ -253,7 +253,7 @@ sub get_doc {
         modtime => $modtime,
         parser  => 'XML*',
         type    => 'application/x-object',
-        obj     => $object
+        data    => $object
     );
 
     $self->debug and print $doc;

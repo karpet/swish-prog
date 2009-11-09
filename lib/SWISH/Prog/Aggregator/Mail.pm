@@ -123,7 +123,7 @@ sub _process_folder {
 
     my @subs    = sort $folder->listSubFolders;
     my $indexer = $self->indexer;
-        
+
     for my $sub (@subs) {
         my $subf = $folder->openSubFolder($sub);
 
@@ -149,7 +149,7 @@ sub _filter_attachment {
 
     my $type     = $attm->body->mimeType->type;
     my $filename = $attm->body->dispositionFilename;
-    my $content  = $attm->decoded . '';  # force stringify
+    my $content  = $attm->decoded . '';                # force stringify
 
     if ( $self->swish_filter_obj->can_filter($type) ) {
 
@@ -193,13 +193,13 @@ sub get_doc {
         url => join( '.', $folder, $message->messageId ),
         id  => $message->messageId,
         subject => $message->subject || '[ no subject ]',
-        date => $message->timestamp,
-        size => $message->size,
-        from => _addresses( $message->from ),
-        to   => _addresses( $message->to ),
-        cc   => _addresses( $message->cc ),
-        bcc  => _addresses( $message->bcc ),
-        type => $message->contentType,
+        date    => $message->timestamp,
+        size    => $message->size,
+        from    => _addresses( $message->from ),
+        to      => _addresses( $message->to ),
+        cc      => _addresses( $message->cc ),
+        bcc     => _addresses( $message->bcc ),
+        type    => $message->contentType,
     );
 
     my @parts = $message->parts;
@@ -221,7 +221,7 @@ sub get_doc {
         modtime => $meta{date},
         parser  => 'XML*',
         type    => 'application/x-swish-mail',    # TODO is this right?
-        mail    => \%meta
+        data    => \%meta
     );
 
     return $doc;
