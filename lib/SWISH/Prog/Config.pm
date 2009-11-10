@@ -18,7 +18,7 @@ our $VERSION = '0.29';
 
 our $XMLer = Search::Tools::XML->new;
 
-# can't use SWISH::Prog::Class because we override the get/set magic.
+# TODO can't use SWISH::Prog::Class because we override the get/set magic.
 use base qw( Class::Accessor );
 
 my %unique = map { $_ => 1 } qw(
