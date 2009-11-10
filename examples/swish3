@@ -112,7 +112,13 @@ $Opt->{debug} and Data::Dump::dump $Opt;
 
 $ENV{SWISH_WARNINGS} = $Opt->{Warnings};
 
-my $prog = SWISH::Prog->new(%$Opt);
+my %prog_can;
+for ( keys %$Opt ) {
+    if ( SWISH::Prog->can($_) ) {
+        $prog_can{$_} = $Opt->{$_};
+    }
+}
+my $prog = SWISH::Prog->new(%prog_can);
 if ( $Opt->{input} ) {
     $prog->index(@ARGV);
 }
