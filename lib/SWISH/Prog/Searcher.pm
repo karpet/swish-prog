@@ -95,6 +95,8 @@ sub init {
         # assume a InvIndex in the same namespace as $self
         my $class = ref($self);
         $class =~ s/::Searcher$/::InvIndex/;
+        eval "require $class";
+        croak $@ if $@;
         $self->{invindex}
             = $class->new( path => $self->{invindex}, clobber => 0 );
 
