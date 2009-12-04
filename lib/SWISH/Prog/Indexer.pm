@@ -5,7 +5,7 @@ use base qw( SWISH::Prog::Class );
 use Scalar::Util qw( blessed );
 use Carp;
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 __PACKAGE__->mk_accessors(qw( invindex config count clobber flush started ));
 

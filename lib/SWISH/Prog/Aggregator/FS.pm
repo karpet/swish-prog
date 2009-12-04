@@ -8,7 +8,7 @@ use File::Slurp;
 use File::Find;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 =pod
 

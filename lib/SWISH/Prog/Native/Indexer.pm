@@ -8,7 +8,7 @@ use SWISH::Prog::Native::InvIndex;
 use SWISH::Prog::Config;
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.31';
+our $VERSION = '0.32';
 
 my $invindex_class = 'SWISH::Prog::Native::InvIndex';
 
