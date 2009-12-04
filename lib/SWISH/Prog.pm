@@ -99,6 +99,10 @@ sub init {
     my ( $aggregator, $indexer, $config );
 
     $indexer = $self->{indexer} || 'native';
+    if ( $self->{aggregator} and blessed( $self->{aggregator} ) ) {
+        $indexer = $self->{aggregator}->indexer;
+        $config  = $self->{aggregator}->config;
+    }
     if ( !blessed($indexer) ) {
 
         if ( exists $ishort{$indexer} ) {
@@ -141,6 +145,7 @@ sub init {
     }
 
     $aggregator = $self->{aggregator} || 'fs';
+
     if ( !blessed($aggregator) ) {
 
         if ( exists $ashort{$aggregator} ) {
