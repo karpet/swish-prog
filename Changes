@@ -120,4 +120,5 @@ Revision history for Perl extension Prog.
         * Config->ver2_to_ver3() method now supported.
         * fix bug in Prog.pm to allow Config passed in aggregator
           and Indexer passed in aggregator
+        * removed dependency on Class::Accessor for Config.pm
  

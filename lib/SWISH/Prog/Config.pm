@@ -20,8 +20,7 @@ our $VERSION = '0.32';
 
 my $XML = Search::Tools::XML->new;
 
-# TODO can't use SWISH::Prog::Class because we override the get/set magic.
-use base qw( Class::Accessor );
+use base qw( SWISH::Prog::Class );
 
 my %unique = map { $_ => 1 } qw(
     MetaNames
@@ -113,8 +112,9 @@ my @Opts = qw(
     Words
     XMLClassAttributes
 );
+my %Opts = map { $_ => $_ } @Opts;
 
-__PACKAGE__->mk_accessors( qw( file debug verbose ), @Opts );
+__PACKAGE__->mk_accessors(qw( file debug verbose ));
 
 =head1 NAME
 
@@ -157,8 +157,6 @@ Example:
 
 =head1 METHODS
 
-NOTE this class inherits from Class::Accessor and not SWISH::Prog::Class.
-
 =head2 new( I<params> )
 
 Instantiate a new Config object. 
@@ -190,19 +188,22 @@ sub new {
     $self->IgnoreTotalWordCountWhenRanking(0)
         unless defined $self->IgnoreTotalWordCountWhenRanking;
 
-    #Carp::cluck();
-    #carp dump $self;
-
     return $self;
 }
 
-=head2 set
+=head2 get_opt_names
 
-Override the Class::Accessor method.
+Class method.
+
+Returns array ref of all the option (method) names supported.
 
 =cut
 
-sub set {
+sub get_opt_names {
+    return [@Opts];
+}
+
+sub _set {
     my $self = shift;
     my ( $key, $val, $append ) = @_;
 
@@ -230,13 +231,7 @@ sub set {
 
 }
 
-=head2 get
-
-Override the Class::Accessor method.
-
-=cut
-
-sub get {
+sub _get {
     my $self = shift;
     my $key  = shift;
 
@@ -793,6 +788,22 @@ KEY: for my $k ( sort keys %$config ) {
 sub _make_tag {
     my ( $self, $tag, $attrs ) = @_;
     return $XML->tag_safe($tag) . $XML->attr_safe($attrs);
+}
+
+sub AUTOLOAD {
+    my $self   = shift;
+    my $method = our $AUTOLOAD;
+    $method =~ s/.*://;
+    return if $method eq 'DESTROY';
+    if ( !exists $Opts{$method} ) {
+        croak("method '$method' not implemented in $self");
+    }
+    if (@_) {
+        return $self->_set( $method, @_ );
+    }
+    else {
+        return $self->_get($method);
+    }
 }
 
 1;
