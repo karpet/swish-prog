@@ -145,7 +145,7 @@ sub start {
     my $cmd = shift || "$exe $opts -f $index -v$v -W$w -S prog -i stdin";
 
     if ( !$self->config->file ) {
-        $self->config->write2;
+        $self->config->write2( 0, 1 );    # write in prog mode
     }
     my $config_file = $self->config->file;
     $cmd .= ' -c ' . $config_file;

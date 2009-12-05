@@ -121,4 +121,6 @@ Revision history for Perl extension Prog.
         * fix bug in Prog.pm to allow Config passed in aggregator
           and Indexer passed in aggregator
         * removed dependency on Class::Accessor for Config.pm
+        * refactor internal handling of Config object so there is only ever one
+          per Prog instance
  

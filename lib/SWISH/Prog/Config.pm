@@ -310,12 +310,16 @@ sub read2 {
     return \%conf;
 }
 
-=head2 write2( I<path/file> )
+=head2 write2( I<path/file> [,I<prog_mode>] )
 
 Writes version 2 compatible config file.
 
 If I<path/file> is omitted, a temp file will be
 written using File::Temp.
+
+If I<prog_mode> is true all config directives 
+inappropriate for the -S prog mode in the Native::Indexer
+are skipped. The default is false.
 
 Returns full path to file.
 
@@ -330,11 +334,12 @@ Returns name of the file written by write2().
 =cut
 
 sub write2 {
-    my $self = shift;
-    my $file = shift || File::Temp->new();
+    my $self      = shift;
+    my $file      = shift || File::Temp->new();
+    my $prog_mode = shift || 0;
 
     # stringify both
-    write_file( "$file", "$self" );
+    write_file( "$file", $self->stringify($prog_mode) );
 
     #warn "$self";
 
@@ -401,9 +406,12 @@ sub all_metanames {
     return \@meta;
 }
 
-=head2 stringify
+=head2 stringify([I<prog_mode>])
 
 Returns object as version 2 formatted scalar.
+
+If I<prog_mode> is true skips inappropriate directives for
+running the Native::Indexer. Default is false. See write2().
 
 This method is used to overload the object for printing, so these are
 equivalent:
@@ -415,6 +423,7 @@ equivalent:
 
 sub stringify {
     my $self = shift;
+    my $prog_mode = shift || 0;
     my @config;
 
    # must pass metanames and properties first, since others may depend on them
@@ -430,6 +439,9 @@ sub stringify {
 
     for my $name (@Opts) {
         next if exists $unique{$name};
+        if ( $prog_mode && $name =~ m/^File/ ) {
+            next;
+        }
 
         my $v = $self->$name;
         next unless defined $v;

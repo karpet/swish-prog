@@ -118,7 +118,7 @@ sub dir_ok {
     my $dir  = shift;
     my $stat = shift || [ stat($dir) ];
 
-    $self->debug and print "checking dir $dir\n";
+    $self->debug and warn "checking dir $dir\n";
 
     return 0 unless -d _;
     return 0 if $dir =~ m!/\.!;
@@ -183,6 +183,7 @@ sub _parse_file_rule {
 sub _apply_file_rules {
     my ( $self, $file ) = @_;
     if ( $self->config->FileRules ) {
+        $self->debug and warn "applying FileRules";
         my $rules = $self->config->FileRules;
         for my $line (@$rules) {
             my $rule = $self->_parse_file_rule($line);
@@ -197,7 +198,7 @@ sub _apply_file_rules {
 
                 my $skip = 0;
                 if ( $rule->{action} eq 'is' ) {
-                    $skip = $rule->{re} eq $filename ? 0 : 1;
+                    $skip = $rule->{re} eq $filename ? 1 : 0;
                 }
                 elsif ( $rule->{action} eq 'contains' ) {
                     if ( $filename =~ m{$rule->{re}} ) {
@@ -218,7 +219,7 @@ sub _apply_file_rules {
             }
         }
     }
-    return 1;                               # no rules
+    return 0;                               # no rules
 }
 
 sub _apply_file_match {
@@ -281,7 +282,7 @@ sub _do_file {
         $self->{indexer}->process($doc);
     }
     else {
-        $self->debug and warn "skipping $file\n";
+        $self->debug and warn "skipping file $file\n";
     }
 }
 
@@ -324,12 +325,12 @@ sub crawl {
                             return;
                         }
 
-                        #warn "$path\n";
+                        #warn "-d $path\n";
                         return;
                     }
                     else {
 
-                        #warn "$path\n";
+                        #warn "!-d $path\n";
                     }
 
                     $self->_do_file($path);

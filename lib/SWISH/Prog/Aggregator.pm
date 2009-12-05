@@ -97,14 +97,7 @@ sub init {
         croak "SWISH::Prog::Indexer-derived object required";
     }
 
-    $self->{config} ||= $self->{indexer}->config;
-
-    if (   !blessed( $self->{config} )
-        or !$self->{config}->isa('SWISH::Prog::Config') )
-    {
-        croak "SWISH::Prog::Config-derived object required";
-    }
-
+    $self->{config} = $self->{indexer}->config;
     $self->{doc_class} ||= 'SWISH::Prog::Doc';
     $self->{swish_filter_obj} ||= SWISH::Filter->new;
 

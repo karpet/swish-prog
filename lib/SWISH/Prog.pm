@@ -89,10 +89,7 @@ sub init {
         return;
     }
 
-    # need to make sure we have 3 items:
-    # aggregator
-    # indexer
-    # config
+    # need to make sure we have an aggregator
     # indexer and/or config might already be set in aggregator
     # but if set here, we override.
 
@@ -110,6 +107,7 @@ sub init {
             $indexer = $ishort{$indexer};
         }
 
+        $self->debug and warn "creating indexer: $indexer";
         eval "require $indexer";
         if ($@) {
             croak "invalid indexer $indexer: $@";
@@ -117,29 +115,12 @@ sub init {
         $indexer = $indexer->new(
             debug    => $self->debug,
             invindex => $self->{invindex},    # may be undef
-            verbose  => $self->verbose
+            verbose  => $self->verbose,
+            config   => $config,              # may be undef
         );
     }
     elsif ( !$indexer->isa('SWISH::Prog::Indexer') ) {
         croak "$indexer is not a SWISH::Prog::Indexer-derived object";
-    }
-
-    # get config
-    $config = $self->{config} || $indexer->config;
-    if ( !blessed($config) ) {
-
-        unless ( -r $config ) {
-            croak "config file $config is not read-able: $!";
-        }
-
-        $config = SWISH::Prog::Config->new(
-            debug   => $self->debug,
-            file    => $config,
-            verbose => $self->verbose
-        );
-    }
-    elsif ( !$config->isa('SWISH::Prog::Config') ) {
-        croak "$config is not a SWISH::Prog::Config-derived object";
     }
 
     $aggregator = $self->{aggregator} || 'fs';
@@ -150,13 +131,13 @@ sub init {
             $aggregator = $ashort{$aggregator};
         }
 
+        $self->debug and warn "creating aggregator: $aggregator";
         eval "require $aggregator";
         if ($@) {
             croak "invalid aggregator $aggregator: $@";
         }
         $aggregator = $aggregator->new(
             indexer => $indexer,
-            config  => $config,
             debug   => $self->debug,
             verbose => $self->verbose
         );
@@ -171,8 +152,10 @@ sub init {
 
     $self->{aggregator} = $aggregator;
     $self->{indexer}    = $indexer;
-    $self->{config}     = $config;
 
+    $self->debug and carp dump $self;
+
+    return $self;
 }
 
 =head2 aggregator( I<$swish_prog_aggregator> )
@@ -217,7 +200,10 @@ sub config {
     if ( $self->aggregator ) {
         return $self->aggregator->config;
     }
-    return $self->{config};
+    if ( $self->indexer ) {
+        return $self->indexer->config;
+    }
+    return undef;
 }
 
 =head2 invindex
