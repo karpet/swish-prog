@@ -98,6 +98,7 @@ sub init {
 
     my ( $aggregator, $indexer, $config );
 
+    # get indexer
     $indexer = $self->{indexer} || 'native';
     if ( $self->{aggregator} and blessed( $self->{aggregator} ) ) {
         $indexer = $self->{aggregator}->indexer;
@@ -123,17 +124,14 @@ sub init {
         croak "$indexer is not a SWISH::Prog::Indexer-derived object";
     }
 
-    $config = $self->{config} || SWISH::Prog::Config->new(
-        debug   => $self->debug,
-        verbose => $self->verbose
-    );
+    # get config
+    $config = $self->{config} || $indexer->config;
     if ( !blessed($config) ) {
 
         unless ( -r $config ) {
             croak "config file $config is not read-able: $!";
         }
 
-        # TODO test for ver2 vs. ver3 style in config
         $config = SWISH::Prog::Config->new(
             debug   => $self->debug,
             file    => $config,
@@ -172,6 +170,8 @@ sub init {
     }
 
     $self->{aggregator} = $aggregator;
+    $self->{indexer}    = $indexer;
+    $self->{config}     = $config;
 
 }
 
@@ -217,7 +217,7 @@ sub config {
     if ( $self->aggregator ) {
         return $self->aggregator->config;
     }
-    return $self->{config} || SWISH::Prog::Config->new;
+    return $self->{config};
 }
 
 =head2 invindex
