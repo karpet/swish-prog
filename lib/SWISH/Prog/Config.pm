@@ -191,6 +191,16 @@ sub new {
     return $self;
 }
 
+=head2 debug
+
+Get/set the debug level. Default is 0.
+
+=head2 verbose
+
+Get/set flags affecting the verbosity of the program.
+
+=cut
+
 =head2 get_opt_names
 
 Class method.
@@ -325,11 +335,9 @@ Returns full path to file.
 
 Full path is also available via file() method.
 
-
 =head2 file
 
 Returns name of the file written by write2().
-
 
 =cut
 
