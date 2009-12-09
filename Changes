@@ -123,4 +123,5 @@ Revision history for Perl extension Prog.
         * removed dependency on Class::Accessor for Config.pm
         * refactor internal handling of Config object so there is only ever one
           per Prog instance
+        * refactor internal handling of Config to support SWISH::3::Config
  

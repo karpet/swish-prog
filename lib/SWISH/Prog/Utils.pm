@@ -43,7 +43,7 @@ Hash of MIME types to their equivalent parser.
 =cut
 
 our $ExtRE
-    = qr{(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3|css|ico|js|php)(\.gz)?}io;
+    = qr{\.(html|htm|xml|txt|pdf|ps|doc|ppt|xls|mp3|css|ico|js|php)(\.gz)?}io;
 our %ParserTypes = (
 
     # mime                  parser type

@@ -9,7 +9,7 @@ use File::Temp ();
 use Search::Tools::XML;
 use Search::Tools::UTF8;
 use SWISH::Prog::Utils;
-use Path::Class qw();    # we have our own file() method
+use File::Spec;
 use overload(
     '""'     => \&stringify,
     bool     => sub {1},
@@ -126,7 +126,7 @@ SWISH::Prog::Config - read/write Swish-e config files
  
  my $config = SWISH::Prog::Config->new;
  $config->write2();
- $config->read2();
+ $config->read2('path/to/file.conf');
  $config->write3();
  
  
@@ -173,9 +173,9 @@ Example:
 
 sub new {
     my $class = shift;
-    my %args;
+    my ( %args, $file2read );
     if ( @_ == 1 && !ref $_[0] ) {
-        $args{file} = shift;
+        $file2read = shift;
     }
     elsif ( !ref $_[0] ) {
         %args = @_;
@@ -187,6 +187,10 @@ sub new {
     $self->{'_start'} = time;
     $self->IgnoreTotalWordCountWhenRanking(0)
         unless defined $self->IgnoreTotalWordCountWhenRanking;
+
+    if ($file2read) {
+        $self->read2($file2read);
+    }
 
     return $self;
 }
@@ -300,21 +304,22 @@ sub read2 {
     my $buf = read_file("$file");
 
     # filter include syntax to work with Config::General's
-    $buf =~ s,IncludeConfigFile (.+?)\n,<<include $1>>\n,g;
+    $buf =~ s,IncludeConfigFile (.+?)\n,Include $1\n,g;
 
-    my $dir = Path::Class::file($file)->parent;
+    my ( $volume, $dir, $filename ) = File::Spec->splitpath($file);
 
     my $c = Config::General->new(
-        -String          => $buf,
-        -IncludeRelative => 1,
-        -ConfigPath      => [$dir]
+        -String           => $buf,
+        -IncludeRelative  => 1,
+        -ConfigPath       => [$dir],
+        -ApacheCompatible => 1,
     ) or return;
 
     my %conf = $c->getall;
 
     for ( keys %conf ) {
         my $v = $conf{$_};
-        $self->$_($v);
+        $self->$_( $v, 1 );
     }
 
     return \%conf;

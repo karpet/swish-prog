@@ -93,7 +93,10 @@ sub init {
     # indexer and/or config might already be set in aggregator
     # but if set here, we override.
 
-    my ( $aggregator, $indexer, $config );
+    my ( $aggregator, $indexer );
+
+    # ok if undef
+    my $config = $self->{config};
 
     # get indexer
     $indexer = $self->{indexer} || 'native';

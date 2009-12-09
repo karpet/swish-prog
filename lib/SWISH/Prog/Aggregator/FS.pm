@@ -6,6 +6,7 @@ use base qw( SWISH::Prog::Aggregator );
 use Carp;
 use File::Slurp;
 use File::Find;
+use File::Spec;
 use Data::Dump qw( dump );
 
 our $VERSION = '0.32';
@@ -98,6 +99,9 @@ sub file_ok {
     $stat ||= [ stat($full_path) ];
     return 0 unless -r _;
     return 0 if -d _;
+    return 0
+        if ( $self->_apply_file_rules($full_path)
+        && !$self->_apply_file_match($full_path) );
 
     $self->debug and warn "  $full_path -> ok\n";
 
@@ -180,53 +184,60 @@ sub _parse_file_rule {
     return $rule;
 }
 
+sub _apply_file_rule {
+    my ( $self, $file, $rule ) = @_;
+    my $skip = 0;
+    my ( $volume, $dirname, $filename ) = File::Spec->splitpath($file);
+
+    $self->debug and warn dump $rule;
+    $self->debug and warn "dirname=$dirname   filename=$filename";
+
+    if ( $rule->{action} eq 'is' ) {
+        $skip = $rule->{re} eq $filename ? 1 : 0;
+    }
+    elsif ( $rule->{action} eq 'contains' ) {
+        if ( $filename =~ m{$rule->{re}} ) {
+            $skip = 1;
+        }
+    }
+    elsif ( $rule->{action} eq 'regex' ) {
+        my $regex = $rule->{re};
+        $regex =~ s/^.|.$//;    # strip delimiter
+        if ( $filename =~ m{$regex} ) {
+            $skip = 1;
+        }
+    }
+
+    $self->debug and warn "FileRule for $file returns $skip";
+
+    return $skip;
+}
+
 sub _apply_file_rules {
     my ( $self, $file ) = @_;
     if ( $self->config->FileRules ) {
         $self->debug and warn "applying FileRules";
         my $rules = $self->config->FileRules;
+
+        #warn dump $rules;
         for my $line (@$rules) {
             my $rule = $self->_parse_file_rule($line);
             if ( $rule->{applies_to} eq 'dir' and -d $file ) {
-
-                my ( $dirname, $filename, $ext )
-                    = SWISH::Prog::Utils->path_parts( $file,
-                    $self->{_ext_re} );
-
-                $self->debug and warn dump $rule;
-                $self->debug and warn "dirname=$dirname   filename=$filename";
-
-                my $skip = 0;
-                if ( $rule->{action} eq 'is' ) {
-                    $skip = $rule->{re} eq $filename ? 1 : 0;
-                }
-                elsif ( $rule->{action} eq 'contains' ) {
-                    if ( $filename =~ m{$rule->{re}} ) {
-                        $skip = 1;
-                    }
-                }
-                elsif ( $rule->{action} eq 'regex' ) {
-                    my $regex = $rule->{re};
-                    $regex =~ s/^.|.$//;    # strip delimiter
-                    if ( $filename =~ m{$regex} ) {
-                        $skip = 1;
-                    }
-                }
-
-                $self->debug and warn "FileRule for $file returns $skip";
-
-                return $skip;
+                return $self->_apply_file_rule( $file, $rule );
+            }
+            elsif ( $rule->{applies_to} eq 'file' and -f $file ) {
+                return $self->_apply_file_rule( $file, $rule );
             }
         }
     }
-    return 0;                               # no rules
+    return 0;    # no rules
 }
 
 sub _apply_file_match {
     my ( $self, $file ) = @_;
 
     # TODO
-    return 0;                               # no-op for now
+    return 0;    # no-op for now
 }
 
 =head2 get_doc( I<file_path> [, I<stat>, I<ext> ] )

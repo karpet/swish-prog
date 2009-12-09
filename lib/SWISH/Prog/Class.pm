@@ -5,6 +5,7 @@ use base qw( Rose::ObjectX::CAF );
 use Carp;
 use Data::Dump qw( dump );
 use SWISH::Prog::Config;
+use Scalar::Util qw( blessed );
 
 our $VERSION = '0.32';
 
@@ -96,12 +97,14 @@ sub verify_isa_swish_prog_config {
     my $self    = shift;
     my $config2 = shift;
 
+    #carp "verify_isa_config: $config2";
+
     my $config2_object;
     if ( !$config2 ) {
         $config2_object = SWISH::Prog::Config->new();
     }
     elsif ( !blessed($config2) && -r $config2 ) {
-        $config2_object = SWISH::Prog::Config->new( file => $config2 );
+        $config2_object = SWISH::Prog::Config->new($config2);
     }
     elsif ( blessed($config2) ) {
         if ( !$config2->isa('SWISH::Prog::Config') ) {
