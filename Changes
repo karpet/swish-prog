@@ -124,4 +124,5 @@ Revision history for Perl extension Prog.
         * refactor internal handling of Config object so there is only ever one
           per Prog instance
         * refactor internal handling of Config to support SWISH::3::Config
+        * FileRules support now in Aggregator::FS
  
