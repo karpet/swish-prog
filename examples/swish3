@@ -24,32 +24,41 @@ my $USAGE = qq{$0
 
  options: defaults are in brackets
  # commented options are not yet supported
-    -b : begin results at this number
-    -c : configuration file(s) to use for indexing
-    #-d : next param is delimiter.
+ 
+ indexing options:
+    -c : configuration file(s)
     -D  : Debug mode
+    -f : invindex dir to create or search from [index.swish]
+    -F : next param is invindex format (ks, xapian, native, or dbi) [native]
+    -i : create an index from the specified files
+        for "-S fs" - specify a list of files or directories
+        for "-S spider" - specify a list of URLs
+    #-l : follow symbolic links when indexing
+    #-M : merges index files
+    #-N : index only files with a modification date newer than path supplied
+    -S : specify which aggregator to use.
+        Valid options are:
+         "fs" - local files in your File System
+         "spider" - web site files using a web crawler
+         #"prog"  - use the program API 
+        The default value is: "fs" 
+    #-T : Trace options ('-T help' for info)
+    -W : next param is ParserWarnLevel [-W 2]
+    
+ search options:
+    -b : begin results at this number
+    #-d : next param is delimiter.
     #-E : Append errors to file specified, or stderr if file not specified.
     #-e : "Economic Mode": The index proccess uses less RAM.
     -f : invindex dir to create or search from [index.swish]
     -F : next param is invindex format (ks, xapian, native, or dbi) [native]
     #-H : "Result Header Output": verbosity (0 to 9)  [1].
-    -i : create an index from the specified files
-        for "-S fs" - specify a list of files or directories
-        for "-S spider" - specify a list of URLs
     #-k : Print words starting with a given char.
-    #-l : follow symbolic links when indexing
     #-L : Limit results to a range of property values
-    #-M : merges index files
     -m : the maximum number of results to return [defaults to all results]
-    #-N : index only files with a modification date newer than path supplied
     #-P : next param is Phrase delimiter.
     #-p : include these document properties in the output "prop1 prop2 ..."
     #-R : next param is Rank Scheme number (0 to 1)  [0].
-    -S : specify which indexing system to use.
-    Valid options are:
-        "fs" - index local files in your File System
-        "spider" - index web site files using a web crawler
-    The default value is: "fs"
     #-s : sort by these document properties in the output "prop1 prop2 ..."
     #-T : Trace options ('-T help' for info)
     #-t : tags to search in - specify as a string
@@ -57,7 +66,6 @@ my $USAGE = qq{$0
     -V : prints the current version
     -v : indexing verbosity level (0 to 3) [-v 1]
     -w : search for words "word1 word2 ..."
-    -W : next param is ParserWarnLevel [-W 2]
     #-x : "Extended Output Format": Specify the output format.
 
 version: $VERSION
@@ -81,7 +89,7 @@ my $Opt = {
 
 my %allopts = (
     'config=s'            => 'config file',
-    'verbose'             => 'be verbose',
+    'verbose:i'           => 'be verbose',
     'debug|Debug'         => 'debugging',
     'Warnings=i'          => 'print libxml2 warnings',
     'aggregator|Source=s' => 'aggregator type',
@@ -120,7 +128,11 @@ for ( keys %$Opt ) {
 }
 my $prog = SWISH::Prog->new(%prog_can);
 if ( $Opt->{input} ) {
-    $prog->index(@ARGV);
+    my $start    = time();
+    my $num_docs = $prog->index(@ARGV);
+    my $end      = time();
+    my $elapsed  = $end - $start;
+    printf("%d documents in %s\n", $num_docs, secs2hms($elapsed));
 }
 elsif ( $Opt->{query} ) {
     my $invindex = $prog->invindex;
@@ -152,6 +164,15 @@ else {
     print $USAGE;
 }
 exit;
+
+sub secs2hms {
+    my $secs  = shift || 0;
+    my $hours = int( $secs / 3600 );
+    my $rm    = $secs % 3600;
+    my $min   = int( $rm / 60 );
+    my $sec   = $rm % 60;
+    return sprintf( "%02d:%02d:%02d", $hours, $min, $sec );
+}
 
 =pod
 
