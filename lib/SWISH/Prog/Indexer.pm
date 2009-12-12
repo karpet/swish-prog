@@ -161,8 +161,16 @@ sub _verify_swish3_config {
 
     #carp dump $self->{config};
 
+    # isa object
+    if ( blessed( $self->{config} ) ) {
+        $self->{config}
+            = $self->verify_isa_swish_prog_config( $self->{config} );
+        my $swish_3_config = $self->{config}->ver2_to_ver3();
+        $self->{s3}->config->add($swish_3_config);
+    }
+
     # xml string
-    if ( $self->{config} =~ m/<swish>/ ) {
+    elsif ( $self->{config} =~ m/<swish>|[\n\r]/ ) {
         $self->{s3}->config->add( $self->{config} );
         $self->{config} = SWISH::Prog::Config->new();
     }
@@ -184,14 +192,6 @@ sub _verify_swish3_config {
             $self->{s3}->config->add($swish_3_config);
         }
 
-    }
-
-    # presumably a SWISH::Prog::Config object
-    elsif ( blessed( $self->{config} ) ) {
-        $self->{config}
-            = $self->verify_isa_swish_prog_config( $self->{config} );
-        my $swish_3_config = $self->{config}->ver2_to_ver3();
-        $self->{s3}->config->add($swish_3_config);
     }
 
     # no support
