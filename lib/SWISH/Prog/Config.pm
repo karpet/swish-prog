@@ -745,7 +745,9 @@ KEY: for my $k ( sort keys %$config ) {
         for my $v ( @{ $conf3{$k} } ) {
             my $val  = $XML->escape( to_utf8($v) );
             my $note = '';
-            if ( exists $unsupported{$key} ) {
+
+            # $key fails to register in exists() below under 5.10
+            if ( exists $unsupported{$k} ) {
                 $note = $disclaimer;
                 $note =~ s/CONFIG/$key/;
             }
