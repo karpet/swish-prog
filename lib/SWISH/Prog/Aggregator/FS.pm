@@ -57,7 +57,7 @@ sub init {
     if ( $self->config->IndexOnly ) {
         my $re = join( '|',
             grep {s/^\.//} split( m/\s+/, $self->config->IndexOnly ) );
-        $self->{_ext_re} = qr{($re)}io;
+        $self->{_ext_re} = qr{\.($re)}io;
     }
     else {
         $self->{_ext_re} = $SWISH::Prog::Utils::ExtRE;
