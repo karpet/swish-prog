@@ -58,12 +58,19 @@ our %ParserTypes = (
 
 # cache to avoid hitting MIME::Type each time
 my %ext2mime = (
-    'htm'  => 'text/html',
-    'html' => 'text/html',
-    'xml'  => 'application/xml',
-    'pdf'  => 'application/pdf',
-    'txt'  => 'text/plain',
-    'gz'   => 'application/x-gzip',
+    doc  => 'application/msword',
+    pdf  => 'application/pdf',
+    ppt  => 'application/vnd.ms-powerpoint',
+    html => 'text/html',
+    htm  => 'text/html',
+    txt  => 'text/plain',
+    text => 'text/plain',
+    xml  => 'application/xml',
+    mp3  => 'audio/mpeg',
+    gz   => 'application/x-gzip',
+    xls  => 'application/vnd.ms-excel',
+    zip  => 'application/zip',
+
 );
 
 # prime the cache with some typical defaults that MIME::Type won't match.
