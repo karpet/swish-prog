@@ -48,7 +48,7 @@ SKIP: {
             $program = undef;
 
         }
-        '<', 1;
+        '==', 1; # there is one in File::Basename we can't control
 
     }
 

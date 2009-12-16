@@ -7,11 +7,12 @@ use SWISH::Prog::Utils;
 use SWISH::Filter;
 use SWISH::Prog::Doc;
 use Scalar::Util qw( blessed );
+use Data::Dump qw( dump );
 
 our $VERSION = '0.33';
 
 __PACKAGE__->mk_accessors(
-    qw( set_parser_from_type indexer doc_class swish_filter_obj ));
+    qw( set_parser_from_type indexer doc_class swish_filter_obj test_mode ));
 __PACKAGE__->mk_ro_accessors(qw( config count ));
 
 =pod
@@ -81,6 +82,11 @@ Default is SWISH::Prog::Doc.
 =item swish_filter_obj
 
 A SWISH::Filter object. If not passed in new() one is created for you.
+
+=item test_mode
+
+Dry run mode, just prints info on stderr but does not
+build index.
 
 =back
 

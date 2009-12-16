@@ -9,7 +9,8 @@ use SWISH::Prog::Config;
 
 our $VERSION = '0.33';
 
-__PACKAGE__->mk_accessors(qw( invindex config count clobber flush started ));
+__PACKAGE__->mk_accessors(
+    qw( invindex config count clobber flush started test_mode ));
 
 =pod
 
@@ -67,6 +68,11 @@ should be written to disk.
 =item invindex
 
 A SWISH::Prog::InvIndex object.
+
+=item test_mode
+
+Dry run mode, just prints info on stderr but does not
+build index.
 
 =back
 
