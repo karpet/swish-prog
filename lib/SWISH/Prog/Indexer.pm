@@ -86,12 +86,14 @@ sub init {
     my $self = shift;
     $self->SUPER::init(@_);
     if (    exists $self->{config}
+        and defined $self->{config}
         and !blessed( $self->{config} )
         and $self->{config} !~ m/<swish>|\.xml$/ )
     {
         $self->{config}
             = $self->verify_isa_swish_prog_config( $self->{config} );
     }
+    $self->{config} ||= SWISH::Prog::Config->new;
     return $self;
 }
 

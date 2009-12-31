@@ -2,14 +2,22 @@ use strict;
 use warnings;
 use constant HAS_LEAKTRACE => eval { require Test::LeakTrace };
 use Test::More HAS_LEAKTRACE
-    ? ( tests => 3 )
+    ? ( tests => 8 )
     : ( skip_all => 'require Test::LeakTrace' );
 use Test::LeakTrace;
+use Data::Dump qw( dump );
 
 #use Devel::LeakGuard::Object qw( GLOBAL_bless :at_end leakguard );
 
 use_ok('SWISH::Prog');
 use_ok('SWISH::Prog::Native::Indexer');
+
+my @classes_to_check = qw(
+    SWISH::Prog::Config
+    SWISH::Prog::Aggregator::FS
+    SWISH::Prog::Native::Indexer
+    SWISH::Prog::Native::InvIndex
+);
 
 SKIP: {
 
@@ -25,8 +33,34 @@ SKIP: {
 SKIP: {
 
         unless ( $ENV{TEST_LEAKS} ) {
-            skip "set TEST_LEAKS to test memory leaks", 1;
+            skip "set TEST_LEAKS to test memory leaks", 2;
         }
+
+        for my $class (@classes_to_check) {
+            eval "use $class";
+            die $@ if $@;
+            leaks_cmp_ok {
+                my @arg;
+                if ( $class =~ m/Aggregator/ ) {
+                    push @arg, indexer => SWISH::Prog::Indexer->new;
+                }
+                my $obj = $class->new(@arg);
+                #dump($obj);
+            }
+            '<', 1, "check $class leaks";
+        }
+
+        leaks_cmp_ok {
+            my $program = SWISH::Prog->new(
+                invindex   => 't/testindex',
+                aggregator => 'fs',
+
+                #config     => 't/test.conf',
+                #indexer    => 'native',
+                #filter     => sub { diag( "doc filter on " . $_[0]->url ) },
+            );
+        }
+        '<', 1, 'basic program leaks';
 
         leaks_cmp_ok {
             my $program = SWISH::Prog->new(
@@ -45,10 +79,8 @@ SKIP: {
             # clean up header so other test counts work
             unlink('t/testindex/swish.xml') unless $ENV{PERL_DEBUG};
 
-            $program = undef;
-
         }
-        '==', 1; # there is one in File::Basename we can't control
+        '==', 1;    # there is one in File::Basename we can't control
 
     }
 

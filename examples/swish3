@@ -120,7 +120,9 @@ $Opt->{invindex} = $Opt->{folder};
 
 $Opt->{debug} and Data::Dump::dump $Opt;
 
-$ENV{SWISH_WARNINGS} = $Opt->{Warnings};
+if ( !exists $ENV{SWISH_WARNINGS} ) {
+    $ENV{SWISH_WARNINGS} = $Opt->{Warnings};
+}
 
 my %prog_can;
 for ( keys %$Opt ) {
@@ -134,7 +136,7 @@ if ( $Opt->{input} ) {
     my $num_docs = $prog->index(@ARGV);
     my $end      = time();
     my $elapsed  = $end - $start;
-    printf( "%d documents in %s\n", ($num_docs||0), secs2hms($elapsed) );
+    printf( "%d documents in %s\n", ( $num_docs || 0 ), secs2hms($elapsed) );
 }
 elsif ( $Opt->{query} ) {
     my $invindex = $prog->invindex;

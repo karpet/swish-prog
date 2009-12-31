@@ -13,7 +13,7 @@ our $VERSION = '0.33';
 
 __PACKAGE__->mk_accessors(
     qw( set_parser_from_type indexer doc_class swish_filter_obj test_mode ));
-__PACKAGE__->mk_ro_accessors(qw( config count ));
+__PACKAGE__->mk_ro_accessors(qw( count ));
 
 =pod
 
@@ -96,14 +96,14 @@ sub init {
     my $self = shift;
     $self->SUPER::init(@_);
     $self->{verbose} ||= 0;
+
     if (   !$self->{indexer}
         or !blessed( $self->{indexer} )
         or !$self->{indexer}->isa('SWISH::Prog::Indexer') )
     {
-        croak "SWISH::Prog::Indexer-derived object required";
+        croak "SWISH::Prog::Indexer-derived object required to crawl()";
     }
 
-    $self->{config} = $self->{indexer}->config;
     $self->{doc_class} ||= 'SWISH::Prog::Doc';
     $self->{swish_filter_obj} ||= SWISH::Filter->new;
 
@@ -115,8 +115,14 @@ sub init {
 
 =head2 config
 
-Returns the SWISH::Prog::Config object being used. This is a read-only
-method (accessor not mutator).
+Returns the SWISH::Prog::Config object from the Indexer
+being used. This is a read-only method (accessor not mutator).
+
+=cut
+
+sub config {
+    return shift->{indexer}->config;
+}
 
 =head2 count
 
