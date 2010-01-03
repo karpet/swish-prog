@@ -132,4 +132,7 @@ Revision history for Perl extension Prog.
         * add test_mode feature (set with SWISH_TEST env var)
         * fix some memory leaks
         * fix JSON::XS dependency (JSON required, not JSON::XS).
+
+0.34    xxx
+        * fix mem leak test to include only those outside our control.
  
