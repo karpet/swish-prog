@@ -6,7 +6,7 @@ use base qw( SWISH::Prog::Aggregator );
 
 use Carp;
 use YAML::Syck ();
-use JSON::XS   ();
+use JSON       ();
 use SWISH::Prog::Utils;
 use Scalar::Util qw( blessed );
 
@@ -307,7 +307,7 @@ sub serialize {
     }
     else {
         if ( $self->serial_format eq 'json' ) {
-            return JSON::XS->new->convert_blessed(1)->allow_blessed(1)
+            return JSON->new->convert_blessed(1)->allow_blessed(1)
                 ->encode($v);
         }
         elsif ( $self->serial_format eq 'yaml' ) {

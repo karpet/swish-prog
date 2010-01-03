@@ -25,7 +25,7 @@ SKIP: {
     my $indexer = SWISH::Prog::Native::Indexer->new;
     my $version = $indexer->swish_check;
     if ( !$version ) {
-        skip "swish-e not installed", 1;
+        skip "swish-e not installed", 6;
     }
 
     diag("$version installed");
@@ -33,7 +33,7 @@ SKIP: {
 SKIP: {
 
         unless ( $ENV{TEST_LEAKS} ) {
-            skip "set TEST_LEAKS to test memory leaks", 2;
+            skip "set TEST_LEAKS to test memory leaks", 6;
         }
 
         for my $class (@classes_to_check) {
@@ -80,7 +80,7 @@ SKIP: {
             unlink('t/testindex/swish.xml') unless $ENV{PERL_DEBUG};
 
         }
-        '==', 1;    # there is one in File::Basename we can't control
+        '<=', 1;    # there is one in File::Basename we can't control
 
     }
 
