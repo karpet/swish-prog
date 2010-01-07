@@ -135,4 +135,5 @@ Revision history for Perl extension Prog.
 
 0.34    xxx
         * fix mem leak test to include only those outside our control.
+        * add version() to SWISH::Prog::Doc to pick header style per instance.
  
