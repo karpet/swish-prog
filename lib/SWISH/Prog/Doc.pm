@@ -16,7 +16,7 @@ our $VERSION = '0.34';
 __PACKAGE__->mk_accessors(
     qw( url modtime type parser content action size charset data version ));
 
-my $default_version = 2;
+my $default_version = $ENV{SWISH3} ? 3 : 2;
 
 my ( $locale, $lang, $charset );
 {
