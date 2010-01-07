@@ -26,7 +26,7 @@ SKIP: {
 SKIP: {
 
         unless ( $ENV{TEST_LEAKS} ) {
-            skip "set TEST_LEAKS to test memory leaks", 6;
+            skip "set TEST_LEAKS to test memory leaks", 1;
         }
 
         leaks_cmp_ok {
