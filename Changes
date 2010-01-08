@@ -133,7 +133,7 @@ Revision history for Perl extension Prog.
         * fix some memory leaks
         * fix JSON::XS dependency (JSON required, not JSON::XS).
 
-0.34    xxx
+0.34    07 Jan 2009
         * fix mem leak test to include only those outside our control.
         * add version() to SWISH::Prog::Doc to pick header style per instance.
  
