@@ -68,7 +68,9 @@ Returns a SWISH::API::Object::Results object.
 
 sub search {
     my $self = shift;
-    return $self->{swish}->query(@_);
+    my $query = shift or croak "query required";
+    my $opts  = shift || {};
+    return $self->{swish}->query($query);
 }
 
 1;
