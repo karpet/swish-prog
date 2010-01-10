@@ -550,7 +550,7 @@ sub ver2_to_ver3 {
     );
     my $disclaimer = "<!-- WARNING: CONFIG ignored by Swish3 -->\n ";
 
-    my $class  = ref($self);
+    my $class  = ref($self) || $self;
     my $config = $file ? $class->new->read2($file) : $self->as_hash;
     my $time   = $no_timestamp ? '' : localtime();
 
