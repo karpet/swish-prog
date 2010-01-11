@@ -677,7 +677,11 @@ KEY: for my $k ( sort keys %$config ) {
         elsif ( $k eq 'StoreDescription' ) {
             for my $line (@args) {
                 my ( $parser_type, $tag, $len )
-                    = ( $line =~ m/^(XML|HTML|TXT)\*? +<(.+)> ?(\d*)$/ );
+                    = ( $line =~ m/^(XML|HTML|TXT)[2\*]? +<(.+?)> ?(\d*)$/ );
+                if (!$tag) {
+                    warn "unparsed config2 line for StoreDescription: $line";
+                    next;
+                }
                 $conf3{'PropertyNames'}->{$tag}->{alias_for}
                     = 'swishdescription';
             }
