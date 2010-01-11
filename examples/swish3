@@ -194,7 +194,9 @@ elsif ( $Opt->{query} ) {
         if ($output_format) {
             my @res;
             for my $prop (@$output_format) {
-                push( @res, $result->get_property($prop) );
+                my $val = $result->get_property($prop);
+                $val =~ s/\003/\\x{03}/g;
+                push( @res, $val );
             }
             printf( $output_format_str, @res );
         }
