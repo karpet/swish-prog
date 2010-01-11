@@ -675,7 +675,6 @@ KEY: for my $k ( sort keys %$config ) {
             }
         }
         elsif ( $k eq 'StoreDescription' ) {
-            warn dump \@args;
             for my $line (@args) {
                 my ( $parser_type, $tag, $len )
                     = ( $line =~ m/^(XML|HTML|TXT)\*? +<(.+)> ?(\d*)$/ );
