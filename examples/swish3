@@ -89,6 +89,7 @@ my $Opt = {
     max             => undef,
     test_mode       => $ENV{SWISH_TEST} || 0,
     extended_output => undef,
+    Limit           => [],
 };
 
 my %allopts = (
@@ -106,6 +107,7 @@ my %allopts = (
     'Version'             => 'print Version',
     'test_mode'           => 'set with SWISH_TEST env var',
     'extended_output|x=s' => 'extended output format string',
+    'Limit=s'             => 'Limit to range of values',
 );
 
 GetOptions( $Opt, keys %allopts ) or die $USAGE;
@@ -157,6 +159,7 @@ elsif ( $Opt->{query} ) {
         $Opt->{query},
         {   start => $Opt->{begin},
             max   => $Opt->{max},
+            limit => parse_limits( $Opt->{Limit} ),
         }
     );
     my ( $output_format, $output_format_str );
@@ -222,6 +225,19 @@ sub secs2hms {
     my $min   = int( $rm / 60 );
     my $sec   = $rm % 60;
     return sprintf( "%02d:%02d:%02d", $hours, $min, $sec );
+}
+
+sub parse_limits {
+    my $limits = shift or return;
+    if ( !@$limits ) {
+        return $limits;
+    }
+    my @parsed;
+    for my $lim (@$limits) {
+        push @parsed, [ split( /\s+/, $lim ) ];
+    }
+    return \@parsed;
+
 }
 
 =pod
