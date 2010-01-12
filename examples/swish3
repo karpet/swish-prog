@@ -162,6 +162,10 @@ elsif ( $Opt->{query} ) {
             limit => parse_limits( $Opt->{Limit} ),
         }
     );
+    printf("# swish3 version %s\n", $VERSION);
+    printf("# Query: %s\n", $Opt->{query});
+    printf("# Hits: %d\n", $results->hits);
+
     my ( $output_format, $output_format_str );
 
     if ( $Opt->{extended_output} ) {
