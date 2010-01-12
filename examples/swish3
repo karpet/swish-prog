@@ -163,7 +163,7 @@ elsif ( $Opt->{query} ) {
 
     if ( $Opt->{extended_output} ) {
         my @props;
-        my $default_properties = SWISH::3::SWISH_DOC_FIELDS_MAP();
+        my $default_properties = SWISH::3::SWISH_DOC_PROP_MAP();
         while ( $Opt->{extended_output} =~ m/<(.+?)>/g ) {
             my $p = $1;
             if (    !exists $meta->PropertyNames->{$p}
