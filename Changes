@@ -145,4 +145,4 @@ Revision history for Perl extension Prog.
 
 0.36    xxx
         * fix Config bug where StoreDescription was ignored in ver2_to_ver3()
- 
+        * switch to Module::Install 
