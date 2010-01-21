@@ -149,3 +149,6 @@ Revision history for Perl extension Prog.
         * updates to example/swish3
         * fix t/03_object.t to test for JSON not YAML::Syck (see RT#53275)
 
+0.37    xxx
+        * add -D '\x03' to the Native::Indexer exec command. This mimics libswish3.
+
