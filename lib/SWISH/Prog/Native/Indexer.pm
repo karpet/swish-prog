@@ -305,6 +305,7 @@ Will croak() on failure.
 sub process {
     my $self = shift;
     my $doc  = $self->SUPER::process(@_);
+    $doc->version(2);
 
     print { $self->fh } $doc
         or croak "failed to print to filehandle " . $self->fh . ": $!\n";
