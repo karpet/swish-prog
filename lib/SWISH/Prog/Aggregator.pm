@@ -12,7 +12,15 @@ use Data::Dump qw( dump );
 our $VERSION = '0.37';
 
 __PACKAGE__->mk_accessors(
-    qw( set_parser_from_type indexer doc_class swish_filter_obj test_mode filter ));
+    qw(
+        set_parser_from_type
+        indexer
+        doc_class
+        swish_filter_obj
+        test_mode filter
+        skip_if_newer_than
+        )
+);
 __PACKAGE__->mk_ro_accessors(qw( count ));
 
 =pod
@@ -98,8 +106,8 @@ there is no C<filter> mutator method.
 =cut
 
 sub init {
-    my $self = shift;
-    my %arg  = @_;
+    my $self   = shift;
+    my %arg    = @_;
     my $filter = delete $arg{filter};
     $self->SUPER::init(%arg);
     $self->{verbose} ||= 0;
@@ -114,8 +122,8 @@ sub init {
     $self->{doc_class} ||= 'SWISH::Prog::Doc';
     $self->{swish_filter_obj} ||= SWISH::Filter->new;
 
-    if ( $filter ) {
-        $self->set_filter( $filter );
+    if ($filter) {
+        $self->set_filter($filter);
     }
 
 }
@@ -240,6 +248,23 @@ sub set_filter {
     }
 
 }
+
+=head2 set_skip_if_newer_than( I<timestamp> )
+
+Set the skip_if_newer_than attribute. I<timestamp> should be a Unix
+epoch value.
+
+=cut
+
+sub set_skip_if_newer_than {
+    my $self = shift;
+    my $ts = shift || 0;
+    if ( $ts =~ m/\D/ ) {
+        croak "timestamp should be an integer";
+    }
+    $self->skip_if_newer_than($ts);
+}
+
 1;
 
 __END__
