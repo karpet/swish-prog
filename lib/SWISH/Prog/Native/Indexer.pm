@@ -257,6 +257,12 @@ sub merge {
         }
     }
 
+    for (@names) {
+        if ( !-s ) {
+            croak "$_ appears to be empty: $!";
+        }
+    }
+
     if ( scalar(@names) > 60 ) {
         carp "Likely too many indexes to merge at one time!"
             . "Your OS may have an open file limit.";
@@ -289,10 +295,17 @@ sub merge {
 
     close(SWISH) or croak "can't close merge(): $cmd: $! ($?)\n";
 
+    # assume that the swish.xml header file is the same for
+    # all the merged files, and preserve this one.
+    my $header = $current_path->file('swish.xml')->stringify;
+    File::Copy::copy( $header, $tmpindex->path->file('swish.xml')->stringify )
+        or croak "copy $header -> $tmpindex failed: $!";
+
     # archive the existing just in case
     my $archive = "$current_path.$$";
     File::Copy::move( $current_path, $archive )
         or croak "move $current_path -> $archive failed: $!";
+
     if ( !File::Copy::move( $tmpindex, $current_path ) ) {
         carp "move $tmpindex -> $current_path failed: $!";
         carp "restoring original index $current_path";
