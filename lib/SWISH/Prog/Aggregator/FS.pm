@@ -99,10 +99,10 @@ sub file_ok {
     $stat ||= [ stat($full_path) ];
     return 0 unless -r _;
     return 0 if -d _;
-    if ( $self->skip_if_newer_than ) {
-        if ( $self->skip_if_newer_than >= $stat->[9] ) {
-            return 0;
-        }
+    if (    $self->ok_if_newer_than
+        and $self->ok_if_newer_than >= $stat->[9] )
+    {
+        return 0;
     }
     return 0
         if ( $self->_apply_file_rules($full_path)
@@ -279,8 +279,8 @@ sub get_doc {
     # might be faster since no OO overhead.
     my $type = SWISH::Prog::Utils->mime_type( $url, $ext );
 
-    if (    $self->skip_if_newer_than
-        and $self->skip_if_newer_than >= $stat->[9] )
+    if (    $self->ok_if_newer_than
+        and $self->ok_if_newer_than >= $stat->[9] )
     {
         warn "skipping $url ... too old\n";
         return;

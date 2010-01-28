@@ -18,7 +18,7 @@ __PACKAGE__->mk_accessors(
         doc_class
         swish_filter_obj
         test_mode filter
-        skip_if_newer_than
+        ok_if_newer_than
         )
 );
 __PACKAGE__->mk_ro_accessors(qw( count ));
@@ -100,6 +100,16 @@ build index.
 
 Value should be a CODE ref. This is passed through to set_filter();
 there is no C<filter> mutator method.
+
+=item ok_if_newer_than
+
+Value should be a Unix timestamp (epoch seconds). Default is undef.
+If set, aggregators should skip files that have a modification time
+older than the timestamp.
+
+You may get/set the ok_if_newer_than value with the ok_if_newer_than()
+attribute method, but use set_ok_if_newer_than() to include validation
+of the supplied I<timestamp> value.
 
 =back
 
@@ -249,20 +259,20 @@ sub set_filter {
 
 }
 
-=head2 set_skip_if_newer_than( I<timestamp> )
+=head2 set_ok_if_newer_than( I<timestamp> )
 
-Set the skip_if_newer_than attribute. I<timestamp> should be a Unix
+Set the ok_if_newer_than attribute. I<timestamp> should be a Unix
 epoch value.
 
 =cut
 
-sub set_skip_if_newer_than {
+sub set_ok_if_newer_than {
     my $self = shift;
     my $ts = shift || 0;
     if ( $ts =~ m/\D/ ) {
         croak "timestamp should be an integer";
     }
-    $self->skip_if_newer_than($ts);
+    $self->ok_if_newer_than($ts);
 }
 
 1;

@@ -10,6 +10,7 @@ requires 'File::Basename'     => 0;
 requires 'MIME::Types'        => 0;
 requires 'Path::Class'        => 0;
 requires 'SWISH::Filter'      => '0.09';
+requires 'Rose::DateTime'     => 0;
 requires 'Rose::ObjectX::CAF' => 0;        # Search::Tools also requires this
 requires 'File::Temp'         => 0;
 requires 'Data::Dump'         => 0;        # Search::Tools also requires this
@@ -32,6 +33,8 @@ recommends 'Mail::Box'          => 0;
 recommends 'DBI'                => 0;
 
 requires_external_bin 'swish-e';
+
+install_script 'examples/swish3';
 
 WriteAll;
 
