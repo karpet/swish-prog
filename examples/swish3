@@ -82,7 +82,7 @@ SWISH::Prog::VERSION : $SWISH::Prog::VERSION
 
 my $Opt = {
     help            => 0,
-    verbose         => 0,
+    verbose         => undef,
     Version         => 0,
     Debug           => 0,
     config          => '',                      #SWISH::Prog::Config->new
@@ -143,6 +143,10 @@ if ( $Opt->{input} ) {
 $Opt->{invindex} = $Opt->{folder};
 
 $Opt->{debug} and Data::Dump::dump $Opt;
+
+if ( defined $Opt->{verbose} and $Opt->{verbose} == 0 ) {
+    $Opt->{verbose} = 1;
+}
 
 if ( !exists $ENV{SWISH_WARNINGS} ) {
     $ENV{SWISH_WARNINGS} = $Opt->{Warnings};
