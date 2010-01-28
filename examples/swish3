@@ -38,7 +38,7 @@ my $USAGE = qq{$0
         for "-S fs" - specify a list of files or directories
         for "-S spider" - specify a list of URLs
     -h : print this usage statement
-    #-l : follow symbolic links when indexing
+    -l : follow symbolic links when indexing
     -M : merges index files
     -N : index only files with a modification date newer than path or date
     -S : specify which aggregator to use.
