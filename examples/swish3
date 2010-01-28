@@ -21,7 +21,7 @@ my $USAGE = qq{$0
           [-m num] [-t str] [-d delim] [-H (num)] [-x output_format] \
           [-R rank_scheme] [-L prop low high]
     swish3 -k (char|*) [-f invindex1 invindex2 ...]
-    swish3 -M invindex1 invindex2 ... outputfile
+    swish3 -M invindex1 ... outputfile
     swish3 -N path/to/compare/file or date
     swish3 -V
     swish3 -h
@@ -263,8 +263,8 @@ elsif ( $Opt->{query} ) {
 elsif ( $Opt->{Merge} ) {
     my @indexes = @ARGV;
     my $num     = scalar(@indexes);
-    if ( $num < 3 ) {
-        die "-M requires minimum of 3 arguments\n";
+    if ( $num < 2 ) {
+        die "-M requires minimum of 2 arguments\n";
     }
     if ( $Opt->{Format} eq 'native' ) {
         require SWISH::Prog::Native::Indexer;
