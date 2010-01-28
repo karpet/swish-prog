@@ -74,8 +74,9 @@ my $USAGE = qq{$0
     -w : search for words "word1 word2 ..."
     -x : "Extended Output Format": Specify the output format.
 
-version: $VERSION
-   docs: http://swish-e.org/swish3/
+      swish3 version : $VERSION
+SWISH::Prog::VERSION : $SWISH::Prog::VERSION
+                docs : http://swish-e.org/swish3/
 
 };
 
