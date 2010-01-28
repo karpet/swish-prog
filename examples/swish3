@@ -75,7 +75,7 @@ my $USAGE = qq{$0
     -x : "Extended Output Format": Specify the output format.
 
 version: $VERSION
- docs: http://swish-e.org/swish3/
+   docs: http://swish-e.org/swish3/
 
 };
 
