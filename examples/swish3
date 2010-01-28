@@ -32,14 +32,14 @@ my $USAGE = qq{$0
  indexing options:
     -c : configuration file
     -D : Debug mode
-    -f : invindex dir to create or search from [index.swish]
+    -f : invindex dir to create or search from [index.swish3]
     -F : next param is invindex format (ks, xapian, native, or dbi) [native]
     -i : create an index from the specified files
         for "-S fs" - specify a list of files or directories
         for "-S spider" - specify a list of URLs
     -h : print this usage statement
     #-l : follow symbolic links when indexing
-    #-M : merges index files
+    -M : merges index files
     -N : index only files with a modification date newer than path or date
     -S : specify which aggregator to use.
         Valid options are:
@@ -55,7 +55,7 @@ my $USAGE = qq{$0
     #-d : next param is delimiter.
     #-E : Append errors to file specified, or stderr if file not specified.
     #-e : "Economic Mode": The index proccess uses less RAM.
-    -f : invindex dir to create or search from [index.swish]
+    -f : invindex dir to create or search from [index.swish3]
     -F : next param is invindex format (ks, xapian, native, or dbi) [native]
     -h : print this usage statement
     #-H : "Result Header Output": verbosity (0 to 9)  [1].
@@ -90,13 +90,15 @@ my $Opt = {
     Format          => 'native',
     query           => '',
     input           => 0,
-    folder          => 'index.swish',
+    folder          => 'index.swish3',
     begin           => 0,
     max             => undef,
     test_mode       => $ENV{SWISH_TEST} || 0,
     extended_output => undef,
     Limit           => [],
     newer_than      => undef,
+    links           => 0,
+    Merge           => undef,
 };
 
 my %allopts = (
@@ -117,6 +119,8 @@ my %allopts = (
     'extended_output|x=s' => 'extended output format string',
     'Limit=s'             => 'Limit to range of values',
     'newer_than|N=s'      => 'index only documents newer than',
+    'links'               => 'follow symbolic links when indexing',
+    'Merge'               => 'merge 2 or more indexes',
 );
 
 GetOptions( $Opt, keys %allopts ) or die $USAGE;
@@ -171,6 +175,9 @@ if ( $Opt->{input} ) {
         $prog->aggregator->set_ok_if_newer_than($ts);
         printf "Skipping documents older than %s\n", scalar localtime($ts);
 
+    }
+    if ( $Opt->{links} and $Opt->{Source} eq 'fs' ) {
+        $prog->aggregator->follow(1);
     }
     my $start    = time();
     my $num_docs = $prog->index(@ARGV);
@@ -246,6 +253,25 @@ elsif ( $Opt->{query} ) {
             printf( qq{%4d %s "%s"\n},
                 $result->score, $result->uri, $result->title );
         }
+    }
+}
+elsif ( $Opt->{Merge} ) {
+    my @indexes = @ARGV;
+    my $num     = scalar(@indexes);
+    if ( $num < 3 ) {
+        die "-M requires minimum of 3 arguments\n";
+    }
+    if ( $Opt->{Format} eq 'native' ) {
+        my $target_invindex = pop(@indexes);
+        my $indexer         = SWISH::Prog::Native::Indexer->new(
+            invindex => $target_invindex,
+            debug    => $Opt->{debug},
+            verbose  => $Opt->{verbose},
+        );
+        $indexer->merge(@indexes);
+    }
+    else {
+        die "InvIndex Format $Opt->{Format} not supported for -M option\n";
     }
 }
 elsif ( $Opt->{Version} ) {

@@ -264,7 +264,6 @@ sub merge {
     my $to_merge     = join( ' ', @names, $self->invindex->file );
     my $current_path = $self->invindex->path;
     my $v            = $self->verbose || 0;
-    my $w    = $self->warnings || 0;      # suffer the peril!
     my $opts = $self->opts || '';
     my $exe  = $self->exe || 'swish-e';
 
@@ -274,7 +273,7 @@ sub merge {
         path => $current_path->parent->subdir('tmpmerge.index') );
     $tmpindex->path->mkpath( $self->debug );
     my $cmd
-        = "$exe $opts -v$v -W$w -M $to_merge $tmpindex/index.swish-e 2>&1";
+        = "$exe $opts -v$v -M $to_merge $tmpindex/index.swish-e 2>&1";
 
     $self->debug and carp "opening: $cmd";
 
