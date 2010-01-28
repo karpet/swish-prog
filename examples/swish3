@@ -274,7 +274,8 @@ elsif ( $Opt->{Merge} ) {
             debug    => $Opt->{debug},
             verbose  => $Opt->{verbose},
         );
-        $indexer->merge(@indexes);
+        $indexer->merge( map { SWISH::Prog::Native::InvIndex->new($_) }
+                @indexes );
     }
     else {
         die "InvIndex Format $Opt->{Format} not supported for -M option\n";
