@@ -154,4 +154,5 @@ Revision history for Perl extension Prog.
         * examples/swish3 now installed by default with usual make install.
         * added -N option to swish3, along with ok_if_newer_than feature in Aggregator.
         * added dependency on Rose::DateTime.
+        * Native Indexer can now merge() and add().
 
