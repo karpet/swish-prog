@@ -263,6 +263,7 @@ elsif ( $Opt->{Merge} ) {
         die "-M requires minimum of 3 arguments\n";
     }
     if ( $Opt->{Format} eq 'native' ) {
+        require SWISH::Prog::Native::Indexer;
         my $target_invindex = pop(@indexes);
         my $indexer         = SWISH::Prog::Native::Indexer->new(
             invindex => $target_invindex,
