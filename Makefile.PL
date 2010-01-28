@@ -36,45 +36,49 @@ requires_external_bin 'swish-e';
 
 install_script 'examples/swish3';
 
-WriteAll;
+my $MM_Version = $ExtUtils::MakeMaker::VERSION;
 
-#WriteMakefile(
-#    NAME          => 'SWISH::Prog',
-#    VERSION_FROM  => 'lib/SWISH/Prog.pm',
-#    AUTHOR        => q{Peter Karman <karman@cpan.org>},
-#    PREREQ_PM     => { %required, %extra, },
-#    ABSTRACT_FROM => 'lib/SWISH/Prog.pm',
-#    PL_FILES      => {},
-#    dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
-#    clean         => {
-#        FILES => join(
-#            ' ',
-#            qw(
-#                t/dbi.index
-#                t/swishobjects
-#                t/testindex
-#                t/object.index
-#                t/xapian.index
-#                t/index.swish
-#                t/spider.index
-#                t/mail.index
-#                )
-#        )
-#    },
-#    ( $MM_Version >= 6.48 ? ( MIN_PERL_VERSION => '5.8.3' ) : () ),
-#    ( $MM_Version >= 6.31 ? ( LICENSE          => 'perl' )  : () ),
-#    (   $MM_Version <= 6.44
-#        ? ()
-#        : ( META_MERGE => {
-#                resources => {
-#                    license  => 'http://dev.perl.org/licenses/',
-#                    homepage => 'http://dev.swish-e.org/wiki/perl',
-#                    bugtracker =>
-#                        'http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog',
-#                    repository => 'http://svn.swish-e.org/perl/SWISH-Prog/',
-#                },
-#            }
-#        )
-#    ),
-#
-#);
+if ( $MM_Version =~ /_/ )                    # dev version
+{
+    $MM_Version = eval $MM_Version;
+    die $@ if ($@);
+}
+
+WriteMakefile(
+    NAME          => 'SWISH::Prog',
+    VERSION_FROM  => 'lib/SWISH/Prog.pm',
+    AUTHOR        => q{Peter Karman <karman@cpan.org>},
+    PL_FILES      => {},
+    dist          => { COMPRESS => 'gzip -9f', SUFFIX => 'gz', },
+    clean         => {
+        FILES => join(
+            ' ',
+            qw(
+                t/dbi.index
+                t/swishobjects
+                t/testindex
+                t/object.index
+                t/xapian.index
+                t/index.swish
+                t/spider.index
+                t/mail.index
+                )
+        )
+    },
+    ( $MM_Version >= 6.48 ? ( MIN_PERL_VERSION => '5.8.3' ) : () ),
+    ( $MM_Version >= 6.31 ? ( LICENSE          => 'perl' )  : () ),
+    (   $MM_Version <= 6.44
+        ? ()
+        : ( META_MERGE => {
+                resources => {
+                    license  => 'http://dev.perl.org/licenses/',
+                    homepage => 'http://dev.swish-e.org/wiki/perl',
+                    bugtracker =>
+                        'http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog',
+                    repository => 'http://svn.swish-e.org/perl/SWISH-Prog/',
+                },
+            }
+        )
+    ),
+
+);
