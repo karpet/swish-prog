@@ -263,17 +263,16 @@ sub merge {
     }
     my $to_merge     = join( ' ', @names, $self->invindex->file );
     my $current_path = $self->invindex->path;
-    my $v            = $self->verbose || 0;
-    my $opts = $self->opts || '';
-    my $exe  = $self->exe || 'swish-e';
+    my $verbose      = $self->verbose || 0;
+    my $opts         = $self->opts || '';
+    my $exe          = $self->exe || 'swish-e';
 
     # we can't replace the index in-place
     # so we create a new temp index, then mv() back
     my $tmpindex = $invindex_class->new(
         path => $current_path->parent->subdir('tmpmerge.index') );
     $tmpindex->path->mkpath( $self->debug );
-    my $cmd
-        = "$exe $opts -v$v -M $to_merge $tmpindex/index.swish-e 2>&1";
+    my $cmd = "$exe $opts -v$verbose -M $to_merge $tmpindex/index.swish-e";
 
     $self->debug and carp "opening: $cmd";
 
@@ -283,7 +282,9 @@ sub merge {
         or croak "can't start merge: $!\n";
 
     while (<SWISH>) {
-        print STDERR $_ if $self->debug;
+        if ( $verbose or $self->debug ) {
+            print STDERR $_;
+        }
     }
 
     close(SWISH) or croak "can't close merge(): $cmd: $! ($?)\n";
