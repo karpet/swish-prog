@@ -274,7 +274,8 @@ elsif ( $Opt->{Merge} ) {
             debug    => $Opt->{debug},
             verbose  => $Opt->{verbose},
         );
-        $indexer->merge( map { SWISH::Prog::Native::InvIndex->new($_) }
+        $indexer->merge(
+            map { SWISH::Prog::Native::InvIndex->new( path => $_ ) }
                 @indexes );
     }
     else {
