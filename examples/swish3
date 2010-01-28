@@ -24,6 +24,7 @@ my $USAGE = qq{$0
     swish3 -M invindex1 invindex2 ... outputfile
     swish3 -N path/to/compare/file or date
     swish3 -V
+    swish3 -h
 
  options: defaults are in brackets
  # commented options are not yet supported
@@ -36,6 +37,7 @@ my $USAGE = qq{$0
     -i : create an index from the specified files
         for "-S fs" - specify a list of files or directories
         for "-S spider" - specify a list of URLs
+    -h : print this usage statement
     #-l : follow symbolic links when indexing
     #-M : merges index files
     -N : index only files with a modification date newer than path or date
@@ -55,6 +57,7 @@ my $USAGE = qq{$0
     #-e : "Economic Mode": The index proccess uses less RAM.
     -f : invindex dir to create or search from [index.swish]
     -F : next param is invindex format (ks, xapian, native, or dbi) [native]
+    -h : print this usage statement
     #-H : "Result Header Output": verbosity (0 to 9)  [1].
     #-k : Print words starting with a given char.
     -L : Limit results to a range of property values
