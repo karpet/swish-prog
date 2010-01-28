@@ -274,6 +274,9 @@ elsif ( $Opt->{Merge} ) {
             debug    => $Opt->{debug},
             verbose  => $Opt->{verbose},
         );
+        if ( !$indexer->invindex->meta ) {
+            die "$target_invindex missing swish.xml header file";
+        }
         $indexer->merge(
             map { SWISH::Prog::Native::InvIndex->new( path => $_ ) }
                 @indexes );
