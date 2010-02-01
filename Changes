@@ -156,4 +156,6 @@ Revision history for Perl extension Prog.
         * added dependency on Rose::DateTime.
         * Native Indexer can now merge() and add().
         * -l and -M options now supported in swish3
+        * yank Query.pm and QueryParser.pm. They weren't used and the idea is now fleshed
+          out in Search::Query if we ever need it.
 

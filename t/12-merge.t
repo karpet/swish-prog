@@ -26,16 +26,12 @@ SKIP: {
 
     ok( my $indexer = SWISH::Prog::Native::Indexer->new(
             invindex => $invindex,
-
-            #config   => $config,
         ),
         "new indexer"
     );
 
     ok( my $aggregator = SWISH::Prog::Aggregator::FS->new(
             indexer => $indexer,
-
-            #config  => $config,
 
             #verbose => 1,
             #debug   => 1,
@@ -47,7 +43,6 @@ SKIP: {
             aggregator => $aggregator,
 
             #verbose    => 1,
-            #config => $config,
         ),
         "new program"
     );
@@ -89,7 +84,6 @@ SKIP: {
         }
         ok( my $searcher = SWISH::Prog::Native::Searcher->new(
                 invindex => $invindex,
-                config   => $prog->config,
             ),
             "new searcher"
         );

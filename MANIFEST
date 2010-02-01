@@ -29,8 +29,6 @@ lib/SWISH/Prog/Native/Indexer.pm
 lib/SWISH/Prog/Native/InvIndex.pm
 lib/SWISH/Prog/Native/Result.pm
 lib/SWISH/Prog/Native/Searcher.pm
-lib/SWISH/Prog/Query.pm
-lib/SWISH/Prog/QueryParser.pm
 lib/SWISH/Prog/Queue.pm
 lib/SWISH/Prog/Result.pm
 lib/SWISH/Prog/Results.pm
@@ -47,7 +45,6 @@ t/03_object.t
 t/04_mail.t
 t/05_spider.t
 t/06_config.t
-t/07_queryparser.t
 t/08_meta.t
 t/09_xml.t
 t/10_config.t
