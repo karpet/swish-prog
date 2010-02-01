@@ -39,8 +39,8 @@ sub init {
     $self->SUPER::init(@_);
 
     $self->{swish} = SWISH::API::Object->new(
-        indexes => [ $self->{invindex}->file ],
-        class   => $self->{result_class} || 'SWISH::Prog::Native::Result',
+        indexes => [ map { $_->file } @{ $self->{invindex} } ],
+        class => $self->{result_class} || 'SWISH::Prog::Native::Result',
         @{ $self->{sao_opts} || [] }
     );
 

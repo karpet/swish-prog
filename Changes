@@ -158,4 +158,5 @@ Revision history for Perl extension Prog.
         * -l and -M options now supported in swish3
         * yank Query.pm and QueryParser.pm. They weren't used and the idea is now fleshed
           out in Search::Query if we ever need it.
+        * Searcher may now take an array of invindex values, and always returns an array ref of values.
 

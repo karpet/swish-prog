@@ -48,6 +48,9 @@ Overrides base method.
 
 A SWISH::Prog::InvIndex object or directory path. Required. Set in new().
 
+May be a single value or an array ref of values (for searching multiple
+indexes at once).
+
 =head2 max_hits
 
 The maximum number of hits to return. Optional. Default is 1000.
@@ -69,20 +72,27 @@ sub init {
     if ( !$self->{invindex} ) {
         croak "invindex required";
     }
-    if ( !blessed( $self->{invindex} ) ) {
 
-        # assume a InvIndex in the same namespace as $self
-        my $class = ref($self);
-        $class =~ s/::Searcher$/::InvIndex/;
-        eval "require $class";
-        croak $@ if $@;
-        $self->{invindex}
-            = $class->new( path => $self->{invindex}, clobber => 0 );
-
-        #warn "new invindex in $class";
-
+    # force into an array
+    if ( ref $self->{invindex} ne 'ARRAY' ) {
+        $self->{invindex} = [ $self->{invindex} ];
     }
-    $self->{invindex}->open_ro;
+
+    for my $invindex ( @{ $self->{invindex} } ) {
+        if ( !blessed($invindex) ) {
+
+            # assume a InvIndex in the same namespace as $self
+            my $class = ref($self);
+            $class =~ s/::Searcher$/::InvIndex/;
+            eval "require $class";
+            croak $@ if $@;
+            $invindex = $class->new( path => $invindex, clobber => 0 );
+
+            #warn "new invindex in $class";
+
+        }
+        $invindex->open_ro;
+    }
 
     return $self;
 }
