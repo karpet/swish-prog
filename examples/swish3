@@ -199,7 +199,6 @@ elsif ( $Opt->{query} ) {
     croak $@ if $@;
     my $searcher = $sclass->new(
         invindex => $invindex->path . '',
-        config   => $meta,
     );
     my $results = $searcher->search(
         $Opt->{query},
