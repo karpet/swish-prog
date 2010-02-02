@@ -69,10 +69,10 @@ sub title   { croak "must implement title" }
 sub summary { croak "must implement summary" }
 
 # version 2 names for the faithful
-*swishdocpath      = \&uri;
-*swishlastmodified = \&mtime;
-*swishtitle        = \&title;
-*swishdescription  = \&summary;
+sub swishdocpath      { shift->uri }
+sub swishlastmodified { shift->mtime }
+sub swishtitle        { shift->title }
+sub swishdescription  { shift->summary }
 
 =head2 get_property( I<property> )
 
