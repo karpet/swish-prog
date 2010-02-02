@@ -160,3 +160,5 @@ Revision history for Perl extension Prog.
           out in Search::Query if we ever need it.
         * Searcher may now take an array of invindex values, and always returns an array ref of values.
 
+0.38    xxx
+        * add support for 'order', 'limit', 'start', 'max' and 'rank_scheme' in Native::Searcher.
