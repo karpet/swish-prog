@@ -43,6 +43,18 @@ sub init {
         class => $self->{result_class} || 'SWISH::Prog::Native::Result',
         @{ $self->{sao_opts} || [] }
     );
+    
+    # add accessor methods to the Result class 
+    # to mimic what SWISH::API::Object does.
+    my $resclass = $self->{swish}->{class};
+    if ( $reclass->can('mk_accessors') ) {
+        my @propnames = $self->{swish}->props;
+        for my $name (@propnames) {
+            if ( !$resclass->can($name) ) {
+                $resclass->mk_accessors($name);
+            }
+        }
+    }
 
     return $self;
 }
