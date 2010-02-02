@@ -163,4 +163,4 @@ Revision history for Perl extension Prog.
 0.38    xxx
         * add support for 'order', 'limit', 'start', 'max' and 'rank_scheme' in Native::Searcher.
         * Utils->perl_to_xml() moved to Search::Tools::XML (where it really belonged).
-
+        * enable more options to swish3
