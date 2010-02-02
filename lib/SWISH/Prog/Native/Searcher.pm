@@ -43,11 +43,11 @@ sub init {
         class => $self->{result_class} || 'SWISH::Prog::Native::Result',
         @{ $self->{sao_opts} || [] }
     );
-    
-    # add accessor methods to the Result class 
+
+    # add accessor methods to the Result class
     # to mimic what SWISH::API::Object does.
     my $resclass = $self->{swish}->{class};
-    if ( $reclass->can('mk_accessors') ) {
+    if ( $resclass->can('mk_accessors') ) {
         my @propnames = $self->{swish}->props;
         for my $name (@propnames) {
             if ( !$resclass->can($name) ) {
@@ -87,7 +87,7 @@ The starting position. Default is 0.
 
 =item max
 
-The ending position. Default is max_hits() as documented 
+The ending position. Default is max_hits() as documented
 in SWISH::Prog::Searcher.
 
 =item order
@@ -157,7 +157,7 @@ Peter Karman, E<lt>perl@peknet.comE<gt>
 =head1 BUGS
 
 Please report any bugs or feature requests to C<bug-swish-prog at rt.cpan.org>, or through
-the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SWISH-Prog>.  
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=SWISH-Prog>.
 I will be notified, and then you'll
 automatically be notified of progress on your bug as I make changes.
 
@@ -199,7 +199,7 @@ L<http://search.cpan.org/dist/SWISH-Prog/>
 Copyright 2008-2009 by Peter Karman
 
 This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
+it under the same terms as Perl itself.
 
 =head1 SEE ALSO
 
