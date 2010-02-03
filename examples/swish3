@@ -101,7 +101,6 @@ my $Opt = {
     links           => 0,
     Merge           => undef,
     Headers         => 1,
-    RankScheme      => 0,
     sort_order      => '',
 };
 
@@ -152,7 +151,7 @@ for my $opt ( keys %$Opt ) {
         and exists $native_only_opts{$opt} )
     {
         ( my $letter = $opt ) =~ s/^(.).+/$1/;
-        print "-$letter is a native-only format option\n";
+        print "-$letter (--$opt) is a native-only format option\n";
         exit 1;
     }
 }
