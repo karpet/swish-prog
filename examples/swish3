@@ -245,7 +245,9 @@ elsif ( $Opt->{query} ) {
         while ( $Opt->{extended_output} =~ m/<(.+?)>/g ) {
             my $p = $1;
             if (    !exists $meta->PropertyNames->{$p}
-                and !exists $default_properties->{$p} )
+                and !exists $default_properties->{$p}
+                and $p ne 'swishtitle'
+                and $p ne 'swishdescription' )
             {
                 croak "Invalid PropertyName: $p";
             }
@@ -275,6 +277,7 @@ elsif ( $Opt->{query} ) {
             my @res;
             for my $prop (@$output_format) {
                 my $val = $result->get_property($prop);
+                $val = '' unless defined $val;
                 $val =~ s/\003/\\x{03}/g;
                 push( @res, $val );
             }
