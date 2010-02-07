@@ -154,7 +154,7 @@ sub start {
 
     $self->debug and carp "opening: $cmd";
 
-    $| = 1;
+    local $| = 1;
 
     open( SWISH, "| $cmd" ) or croak "can't exec $cmd: $!\n";
 

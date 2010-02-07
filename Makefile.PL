@@ -32,8 +32,6 @@ recommends 'JSON'               => 2.0;
 recommends 'Mail::Box'          => 0;
 recommends 'DBI'                => 0;
 
-requires_external_bin 'swish-e';
-
 perl_version '5.8.3';
 license 'http://dev.perl.org/licenses/';
 homepage 'http://dev.swish-e.org/wiki/perl';
