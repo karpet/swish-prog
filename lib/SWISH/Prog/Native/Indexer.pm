@@ -9,7 +9,7 @@ use SWISH::Prog::Config;
 use Scalar::Util qw( blessed );
 use File::Copy ();
 
-our $VERSION = '0.38';
+our $VERSION = '0.39';
 
 my $invindex_class = 'SWISH::Prog::Native::InvIndex';
 
@@ -258,7 +258,7 @@ sub merge {
     }
 
     for (@names) {
-        if ( !-s ) {
+        if ( !-s "$_.prop" ) {  # test .prop file since that is both 2.4 and 2.6
             croak "$_ appears to be empty: $!";
         }
     }
