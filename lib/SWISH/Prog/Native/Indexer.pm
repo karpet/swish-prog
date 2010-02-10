@@ -121,7 +121,9 @@ sub swish_check {
     if ( !@vers ) {
         return 0;
     }
-    return $self->{_exe_version} = $vers[0];
+    $self->{_exe_version} = $vers[0];
+    $self->{_exe_version} =~ s/SWISH-E //;
+    return $self->{_exe_version};
 }
 
 =head2 start( [cmd] )

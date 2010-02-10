@@ -62,6 +62,7 @@ sub init {
     my $self = shift;
     $self->SUPER::init(@_);
     $self->{debug} ||= $ENV{PERL_DEBUG} || 0;
+    $self->{verbose} ||= $ENV{PERL_VERBOSE} || 0;
     $self->{_start} = time();
     return $self;
 }
