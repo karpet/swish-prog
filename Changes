@@ -179,3 +179,6 @@ Revision history for Perl extension Prog.
         * fix the check_swish() feature in Native::Indexer to only return the version number,
           not the whole output of swish-e -V (fixes the -D fix in 0.40).
 
+0.42    xxx
+        * add invindex format to search output headers
+
