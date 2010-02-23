@@ -9,6 +9,7 @@ our $VERSION = '0.42';
 __PACKAGE__->mk_accessors(
     qw(
         hits
+        query
         ),
 );
 

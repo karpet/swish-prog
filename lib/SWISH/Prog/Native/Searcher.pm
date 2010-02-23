@@ -141,6 +141,7 @@ sub search {
     }
 
     my $results = $searcher->execute($query);
+    $results->{query} = join(' ', $results->parsed_words( $swishdb->indexes->[0] ));
     $swishdb->die_on_error;
     $results->seek_result($start);
     return $results;
