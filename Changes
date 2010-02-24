@@ -182,4 +182,4 @@ Revision history for Perl extension Prog.
 0.42    xxx
         * add invindex format to search output headers
         * add parsed query to search output headers; add query() method to base Results class.
-
+        * add progress_size to Aggregator and implement in FS.

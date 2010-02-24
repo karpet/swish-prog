@@ -38,6 +38,10 @@ returning results from a SWISH::Prog::InvIndex.
 
 =head1 METHODS
 
+=head2 query
+
+Should return the search query as it was evaluated by the Searcher.
+
 =head2 hits
 
 Returns the number of matching documents for the query.
