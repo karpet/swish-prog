@@ -109,7 +109,7 @@ sub file_ok {
         && !$self->_apply_file_match($full_path) );
 
     $self->debug and warn "  $full_path -> ok\n";
-    if ( $self->verbose & 3 ) {
+    if ( $self->verbose & 4 ) {
         print "crawling $full_path\n";
     }
 
