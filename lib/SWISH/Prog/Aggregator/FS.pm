@@ -85,7 +85,7 @@ sub file_ok {
     my $full_path = shift;
     my $stat      = shift;
 
-    $self->debug and print "checking file $full_path\n";
+    $self->debug and warn "checking file $full_path\n";
 
     my ( $path, $file, $ext )
         = SWISH::Prog::Utils->path_parts( $full_path, $self->{_ext_re} );
@@ -110,6 +110,7 @@ sub file_ok {
 
     $self->debug and warn "  $full_path -> ok\n";
     if ( $self->verbose & 4 ) {
+        local $| = 1;    # don't buffer
         print "crawling $full_path\n";
     }
 
@@ -142,6 +143,7 @@ sub dir_ok {
 
     $self->debug and warn "  $dir -> ok\n";
     if ( $self->verbose & 2 ) {
+        local $| = 1;                       # don't buffer
         print "crawling $dir\n";
     }
 
@@ -310,6 +312,7 @@ sub _do_file {
     if ( $self->progress_size and !( $self->{count} % $self->progress_size ) )
     {
         if ( $self->verbose & 1 ) {
+            local $| = 1;    # don't buffer
             print "crawled $self->{count} files\n";
         }
     }
