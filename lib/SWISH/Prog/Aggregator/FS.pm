@@ -15,7 +15,7 @@ our $VERSION = '0.43';
 
 =head1 NAME
 
-SWISH::Prog::Aggregator::FS - filesystem aggregator
+SWISH::Prog::Aggregator::FS - crawl a filesystem
 
 =head1 SYNOPSIS
 
@@ -389,6 +389,7 @@ sub crawl {
         );
     }
 
+    return $self->{count};
 }
 
 1;

@@ -16,7 +16,7 @@ my $XMLer = Search::Tools::XML->new();
 
 =head1 NAME
 
-SWISH::Prog::Aggregator::Mail - index email with Swish-e
+SWISH::Prog::Aggregator::Mail - crawl a mail box
 
 =head1 SYNOPSIS
     
