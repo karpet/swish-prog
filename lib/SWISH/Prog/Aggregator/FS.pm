@@ -269,12 +269,12 @@ sub get_doc {
     # but obviously only available if SWISH::3 is loaded.
     # NOTE we always read in binary (raw) mode in case
     # the file is compressed, binary, etc.
-    if ( $self->{_swish3} ) {
-        eval { $buf = $self->{_swish3}->slurp( $url, 1 ) };
-    }
-    else {
+    #if ( $self->{_swish3} ) {
+    #    eval { $buf = $self->{_swish3}->slurp( $url, 1 ) };
+    #}
+    #else {
         eval { $buf = read_file( $url, binmode => ':raw' ) };
-    }
+    #}
 
     if ($@) {
         carp "unable to read $url - skipping";
