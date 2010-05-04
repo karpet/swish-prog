@@ -193,3 +193,5 @@ Revision history for Perl extension Prog.
 0.44    19 Mar 2010
         * register MailFS aggregator as 'mailfs' for use with swish3 -S
 
+0.45    xxx
+        * fix swish3 to allow "swishrank" as -x option

@@ -11,7 +11,7 @@ use Getopt::Long qw(:config no_ignore_case);
 use Data::Dump qw( dump );
 use Rose::DateTime::Util qw(parse_date);
 
-my $VERSION = '3.0.5';
+my $VERSION = '3.0.6';
 
 my $USAGE = qq{$0
  usage:
@@ -248,9 +248,10 @@ elsif ( $Opt->{query} ) {
             if (    !exists $meta->PropertyNames->{$p}
                 and !exists $default_properties->{$p}
                 and $p ne 'swishtitle'
-                and $p ne 'swishdescription' )
+                and $p ne 'swishdescription'
+                and $p ne 'swishrank' )
             {
-                croak "Invalid PropertyName: $p";
+                die "Invalid PropertyName: $p\n";
             }
             else {
                 push @props, $p;
@@ -277,7 +278,13 @@ elsif ( $Opt->{query} ) {
         if ($output_format) {
             my @res;
             for my $prop (@$output_format) {
-                my $val = $result->get_property($prop);
+                my $val;
+                if ( $prop eq 'swishrank' ) {
+                    $val = $result->score;
+                }
+                else {
+                    $val = $result->get_property($prop);
+                }
                 $val = '' unless defined $val;
                 $val =~ s/\003/\\x{03}/g;
                 push( @res, $val );

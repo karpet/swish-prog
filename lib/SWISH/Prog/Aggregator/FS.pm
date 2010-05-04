@@ -9,7 +9,7 @@ use File::Find;
 use File::Spec;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.44_01';
+our $VERSION = '0.45';
 
 =pod
 
