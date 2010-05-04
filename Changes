@@ -195,3 +195,4 @@ Revision history for Perl extension Prog.
 
 0.45    xxx
         * fix swish3 to allow "swishrank" as -x option
+        * enable -H option in swish3
