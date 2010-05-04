@@ -299,6 +299,7 @@ elsif ( $Opt->{query} ) {
             last if ++$counter >= $Opt->{max};
         }
     }
+    print ".\n";
 }
 elsif ( $Opt->{Merge} ) {
     my @indexes = @ARGV;
