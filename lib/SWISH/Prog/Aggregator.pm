@@ -229,6 +229,11 @@ sub swish_filter {
             return;
         }
 
+        if ( $self->debug > 1 ) {
+            warn "$url [$type] was filtered\n";
+            warn "content changed\n" if $doc->content ne ${ $f->fetch_doc };
+        }
+
         $doc->content( ${ $f->fetch_doc } );
 
         # leave type and parser as-is

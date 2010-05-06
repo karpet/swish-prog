@@ -196,3 +196,6 @@ Revision history for Perl extension Prog.
 0.45    xxx
         * fix swish3 to allow "swishrank" as -x option
         * enable -H option in swish3
+        * SWISH::3->slurp optimization now uses transparent gunzip feature. Requires SWISH::3 >= 0.06.
+
+
