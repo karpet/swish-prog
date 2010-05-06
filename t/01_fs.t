@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 17;
+use Test::More tests => 14;
 
 use_ok('SWISH::Prog');
 use_ok('SWISH::Prog::Native::Indexer');
@@ -12,7 +12,7 @@ SKIP: {
     # is executable present?
     my $test = SWISH::Prog::Native::Indexer->new;
     if ( !$test->swish_check ) {
-        skip "swish-e not installed", 13;
+        skip "swish-e not installed", 10;
     }
 
     ok( my $config = SWISH::Prog::Config->new('t/test.conf'),
@@ -55,26 +55,22 @@ SKIP: {
 
     ok( $prog->run('t/'), "run program" );
 
-    is( $prog->count, 6, "indexed test docs" );
+    is( $prog->count, 7, "indexed test docs" );
 
     # test with a search
 SKIP: {
 
         eval { require SWISH::Prog::Native::Searcher; };
         if ($@) {
-            skip "Cannot test Searcher without SWISH::API", 6;
+            skip "Cannot test Searcher without SWISH::API", 3;
         }
         ok( my $searcher
                 = SWISH::Prog::Native::Searcher->new( invindex => $invindex,
                 ),
             "new searcher"
         );
-        ok( my $results = $searcher->search('gzip-special'), "do search" );
-        is( $results->hits, 1, "1 hit" );
-        ok( my $result = $results->next, "results->next" );
-        is( $result->swishtitle, 'test gzip html doc', "get swishtitle" );
-        is( $result->get_property('swishtitle'),
-            $result->swishtitle, "get_property(swishtitle)" );
+        ok( my $results = $searcher->search('gzip'), "do search" );
+        is( $results->hits, 2, "2 gzip hits" );
 
     }
 
