@@ -199,4 +199,7 @@ Revision history for Perl extension Prog.
         * SWISH::3->slurp optimization now uses transparent gunzip feature. Requires SWISH::3 >= 0.06.
         * fix backcompat for DefaultContents config in Config->ver2_to_ver3()
 
+0.46    xxx
+        * add dep on Search::Query
+        * add default_boolop feature to Native::Searcher
 
