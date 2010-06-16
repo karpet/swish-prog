@@ -26,7 +26,7 @@ my %unique = map { $_ => 1 } qw(
     MetaNames
     PropertyNames
     PropertyNamesNoStripChars
-
+    IncludeConfigFile
 );
 
 my @Opts = qw(
