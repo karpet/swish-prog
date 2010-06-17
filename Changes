@@ -202,4 +202,5 @@ Revision history for Perl extension Prog.
 0.46    xxx
         * add dep on Search::Query
         * add default_boolop feature to Native::Searcher
+        * fix IncludeConfigFile recursionin Config->ver2_to_ver()
 
