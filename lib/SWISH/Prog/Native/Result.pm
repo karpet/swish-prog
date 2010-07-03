@@ -98,6 +98,9 @@ Same as calling property().
 sub get_property {
     my $self = shift;
     my $propname = shift or croak "propname required";
+    if ( $self->can($propname) ) {
+        return $self->$propname;
+    }
     return $self->swish_result->property($propname);
 }
 
