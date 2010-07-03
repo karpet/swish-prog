@@ -9,7 +9,7 @@ use SWISH::Prog::Doc;
 use Scalar::Util qw( blessed );
 use Data::Dump qw( dump );
 
-our $VERSION = '0.46';
+our $VERSION = '0.47';
 
 __PACKAGE__->mk_accessors(
     qw(
