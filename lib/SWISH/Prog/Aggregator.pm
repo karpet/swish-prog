@@ -245,6 +245,14 @@ sub swish_filter {
         $doc->parser( $f->swish_parser_type ) if $self->set_parser_from_type;
 
     }
+    else {
+
+        if ($self->debug) {
+            warn sprintf("skipping %s - cannot filter %s\n", $doc->url, $doc->type);
+            warn sprintf(" available filter: %s\n", $_) for $self->{swish_filter_obj}->filter_list;
+        }
+
+    }
 
 }
 

@@ -344,6 +344,10 @@ sub process {
     my $doc  = $self->SUPER::process(@_);
     $doc->version(2);
 
+    if ($self->debug) {
+        warn $doc;
+    }
+
     print { $self->fh } $doc
         or croak "failed to print to filehandle " . $self->fh . ": $!\n";
 
