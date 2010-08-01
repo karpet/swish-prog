@@ -319,7 +319,6 @@ sub get_doc {
 sub _do_file {
     my $self = shift;
     my $file = shift;
-    $self->_increment_count;
     if ( my $ext = $self->file_ok($file) ) {
         my $doc = $self->get_doc( $file, [ stat(_) ], $ext );
         $self->swish_filter($doc);
@@ -329,6 +328,7 @@ sub _do_file {
         else {
             $self->{indexer}->process($doc);
         }
+        $self->_increment_count;
     }
     else {
         $self->debug and warn "skipping file $file\n";
