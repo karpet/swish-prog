@@ -232,13 +232,14 @@ T: for my $table (@tables) {
         my $title = delete( $table_info->{swishtitle} )       || '';
 
         # TODO test other dbs besides mysql for quoting etc.
-        $self->{count} += $self->_do_table(
+        my $c = $self->_do_table(
             name  => $table . ".index",
             sql   => "SELECT `" . join( '`,`', @cols ) . "` FROM $table",
             table => $table,
             desc  => $desc,
             title => $title,
         );
+        $self->_increment_count($c);
     }
 
     return $self->{count};

@@ -11,8 +11,9 @@ use Getopt::Long qw(:config no_ignore_case);
 use Data::Dump qw( dump );
 use Rose::DateTime::Util qw(parse_date);
 use Time::HiRes;
+use IO::Interactive qw( is_interactive );
 
-my $VERSION = '3.0.7';
+my $VERSION = '3.0.8';
 
 my $USAGE = qq{$0
  usage:
@@ -32,6 +33,7 @@ my $USAGE = qq{$0
 
  indexing options:
     -c : configuration file
+    -e : next param is total expected files (generates progress bar)
     -D : Debug mode
     -f : invindex dir to create or search from [index.swish3]
     -F : next param is invindex format (ks, xapian, native, or dbi) [native]
@@ -103,6 +105,7 @@ my $Opt = {
     Merge           => undef,
     Headers         => 1,
     sort_order      => '',
+    expected        => undef,
 };
 
 my %allopts = (
@@ -128,6 +131,7 @@ my %allopts = (
     'Headers=i'           => 'Header output verbosity',
     'RankScheme=i'        => 'ranking algorithm (native only)',
     'sort_order=s'        => 'result sort order',
+    'expected=i'          => 'expected total docs (generates progress bar)',
 );
 
 my %native_only_opts = ( 'RankScheme' => 1, );
@@ -151,6 +155,10 @@ for my $opt ( keys %$Opt ) {
         print "-$letter (--$opt) is a native-only format option\n";
         exit 1;
     }
+}
+
+if ( $Opt->{expected} && is_interactive() ) {
+    $Opt->{progress} = progress_bar( delete $Opt->{expected} );
 }
 
 #croak $USAGE unless @ARGV;
@@ -201,6 +209,9 @@ if ( $Opt->{input} ) {
     }
     if ( $Opt->{links} and $Opt->{Source} eq 'fs' ) {
         $prog->aggregator->follow(1);
+    }
+    if ( defined $Opt->{progress} ) {
+        $prog->aggregator->progress( delete $Opt->{progress} );
     }
     my $start    = time();
     my $num_docs = $prog->index(@ARGV);
@@ -358,6 +369,18 @@ sub parse_limits {
 
 }
 
+sub progress_bar {
+    require Term::ProgressBar;
+    my $total = shift;
+    my $tpb   = Term::ProgressBar->new(
+        {   ETA   => 'linear',
+            name  => 'swish3',
+            count => $total,
+        }
+    );
+    return $tpb;
+}
+
 __END__
 
 =pod
@@ -368,7 +391,7 @@ swish3 - SWISH::Prog-based Swish3 implementation
 
 =head1 SYNOPSIS
 
-    swish3 [-e] [-i dir file ... ] [-S aggregator] [-c file] [-f invindex] [-l] [-v (num)]
+    swish3 [-e N] [-i dir file ... ] [-S aggregator] [-c file] [-f invindex] [-l] [-v (num)]
     swish3 -w word1 word2 ... [-f file1 file2 ...] \
           [-P phrase_delimiter] [-p prop1 ...] [-s sortprop1 [asc|desc] ...] \
           [-m num] [-t str] [-d delim] [-H (num)] [-x output_format] \

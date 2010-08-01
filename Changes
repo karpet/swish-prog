@@ -208,3 +208,6 @@ Revision history for Perl extension Prog.
         * add Search time to swish3 (3.0.7)
         * fix bug in Native::Searcher affecting fieldtypes
 
+0.48    xxx
+        * added progress() feature to Aggregator classes, and 'expected' param to swish3.
+

@@ -445,8 +445,8 @@ sub crawl {
         $self->{_base} = $uri->canonical->as_string;
         while ( my $doc = $self->get_doc ) {
             next unless blessed($doc);
-            $self->{count}++;
             $indexer->process($doc);
+            $self->_increment_count;
         }
     }
 

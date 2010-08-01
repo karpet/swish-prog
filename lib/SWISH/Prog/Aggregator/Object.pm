@@ -189,15 +189,16 @@ sub crawl {
     my $self    = shift;
     my $data    = shift;
     my $indexer = $self->indexer;
-    $self->{count}
-        = 0;    # IMPORTANT! that this not be undef since url defaults to it.
+
+    # IMPORTANT! that this not be undef since url defaults to it.
+    $self->{count} = 0;
 
     if ( ref($data) eq 'ARRAY' ) {
 
         $self->{class} ||= blessed( $data->[0] );
         for my $o (@$data) {
             $indexer->process( $self->get_doc($o) );
-            $self->{count}++;
+            $self->_increment_count;
         }
 
     }
@@ -208,7 +209,7 @@ sub crawl {
 
         while ( my $o = $data->next ) {
             $indexer->process( $self->get_doc($o) );
-            $self->{count}++;
+            $self->_increment_count;
         }
     }
     else {

@@ -132,7 +132,7 @@ sub _process_folder {
         foreach my $message ( $subf->messages ) {
             my $doc = $self->get_doc( $sub, $message );
             $indexer->process($doc);
-            $self->{count}++;
+            $self->_increment_count;
         }
 
         $self->_process_folder($subf);

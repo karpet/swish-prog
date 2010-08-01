@@ -2,6 +2,7 @@ package SWISH::Prog::Doc;
 use strict;
 use warnings;
 use Carp;
+use Data::Dump qw( dump );
 use base qw( SWISH::Prog::Class );
 use overload(
     '""'     => \&as_string,

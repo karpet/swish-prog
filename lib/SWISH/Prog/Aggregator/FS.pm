@@ -319,14 +319,7 @@ sub get_doc {
 sub _do_file {
     my $self = shift;
     my $file = shift;
-    $self->{count}++;
-    if ( $self->progress_size and !( $self->{count} % $self->progress_size ) )
-    {
-        if ( $self->verbose & 1 ) {
-            local $| = 1;    # don't buffer
-            print "crawled $self->{count} files\n";
-        }
-    }
+    $self->_increment_count;
     if ( my $ext = $self->file_ok($file) ) {
         my $doc = $self->get_doc( $file, [ stat(_) ], $ext );
         $self->swish_filter($doc);
