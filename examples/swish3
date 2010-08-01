@@ -11,7 +11,6 @@ use Getopt::Long qw(:config no_ignore_case);
 use Data::Dump qw( dump );
 use Rose::DateTime::Util qw(parse_date);
 use Time::HiRes;
-use IO::Interactive qw( is_interactive );
 
 my $VERSION = '3.0.8';
 
@@ -157,7 +156,7 @@ for my $opt ( keys %$Opt ) {
     }
 }
 
-if ( $Opt->{Expected} && is_interactive() ) {
+if ( $Opt->{Expected} ) {
     $Opt->{progress} = progress_bar( delete $Opt->{Expected} );
 }
 

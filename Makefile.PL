@@ -33,7 +33,6 @@ recommends 'YAML::Syck'         => '0.72';
 recommends 'JSON'               => 2.0;
 recommends 'Mail::Box'          => 0;
 recommends 'DBI'                => 0;
-recommends 'IO::Interactive'    => 0;
 recommends 'Term::ProgressBar'  => 0;
 
 perl_version '5.8.3';
