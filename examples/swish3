@@ -156,10 +156,6 @@ for my $opt ( keys %$Opt ) {
     }
 }
 
-if ( $Opt->{Expected} ) {
-    $Opt->{progress} = progress_bar( delete $Opt->{Expected} );
-}
-
 #croak $USAGE unless @ARGV;
 
 if ( $Opt->{input} ) {
@@ -209,8 +205,8 @@ if ( $Opt->{input} ) {
     if ( $Opt->{links} and $Opt->{Source} eq 'fs' ) {
         $prog->aggregator->follow(1);
     }
-    if ( defined $Opt->{progress} ) {
-        $prog->aggregator->progress( delete $Opt->{progress} );
+    if ( $Opt->{Expected} ) {
+        $prog->aggregator->progress( progress_bar( $Opt->{Expected} ) );
     }
     my $start    = time();
     my $num_docs = $prog->index(@ARGV);
