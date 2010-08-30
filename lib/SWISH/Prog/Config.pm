@@ -34,6 +34,7 @@ my @Opts = qw(
     BeginCharacters
     BumpPositionCounterCharacters
     Buzzwords
+    CascadeMetaContext
     ConvertHTMLEntities
     DefaultContents
     Delay

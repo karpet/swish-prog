@@ -210,4 +210,4 @@ Revision history for Perl extension Prog.
 
 0.48    xxx
         * added progress() feature to Aggregator classes, and 'expected' param to swish3.
-
+        * add CascadeMetaContext config option for Swish3 compatibility
