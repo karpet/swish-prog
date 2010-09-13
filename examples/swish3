@@ -203,7 +203,7 @@ if ( $Opt->{input} ) {
 
     }
     if ( $Opt->{links} and $Opt->{Source} eq 'fs' ) {
-        $prog->aggregator->follow(1);
+        $prog->aggregator->config->FollowSymLinks(1);
     }
     if ( $Opt->{Expected} ) {
         $prog->aggregator->progress( progress_bar( $Opt->{Expected} ) );
