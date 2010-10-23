@@ -65,7 +65,7 @@ sub init {
 
     # if running with SWISH::3,
     # instantiate for the slurp advantage
-    eval "use SWISH::3 0.06";
+    eval "use SWISH::3 0.09";
     if ( !$@ ) {
         $self->{_swish3} = SWISH::3->new;
     }
