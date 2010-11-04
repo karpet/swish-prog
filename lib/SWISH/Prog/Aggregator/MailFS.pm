@@ -135,6 +135,9 @@ sub get_doc {
 
     # and finally convert to the SWISH::Prog::Doc we intend to return
     my $mail = $self->{_mailer}->get_doc( $folder, $msg );
+    
+    # reinstate original url from filesystem
+    $mail->url($doc->url);
 
     #carp "second pass for mail doc: " . dump($mail);
 
