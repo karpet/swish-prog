@@ -9,7 +9,7 @@ use File::Find;
 use File::Spec;
 use Data::Dump qw( dump );
 
-our $VERSION = '0.48';
+our $VERSION = '0.49';
 
 =pod
 
@@ -91,6 +91,8 @@ sub file_ok {
 
     my ( $path, $file, $ext )
         = SWISH::Prog::Utils->path_parts( $full_path, $self->{_ext_re} );
+
+    $self->debug and warn "path=$path file=$file ext=$ext\n";
 
     return 0 unless $ext;
     return 0 if $full_path =~ m![\\/](\.svn|RCS)[\\/]!; # TODO configure this.
@@ -223,7 +225,8 @@ sub _apply_file_rule {
         }
     }
 
-    $self->debug and warn "FileRule for $file returns $skip";
+    $self->debug
+        and warn "FileRule for $file returns $skip : " . dump($rule) . "\n";
 
     return $skip;
 }
@@ -235,14 +238,21 @@ sub _apply_file_rules {
         my $rules = $self->config->FileRules;
 
         #warn dump $rules;
+        my $pass = 0;
         for my $line (@$rules) {
             my $rule = $self->_parse_file_rule($line);
             if ( $rule->{applies_to} eq 'dir' and -d $file ) {
-                return $self->_apply_file_rule( $file, $rule );
+                $pass += $self->_apply_file_rule( $file, $rule );
             }
             elsif ( $rule->{applies_to} eq 'file' and -f $file ) {
-                return $self->_apply_file_rule( $file, $rule );
+                $pass += $self->_apply_file_rule( $file, $rule );
             }
+        }
+        if ( $pass == scalar(@$rules) ) {
+            return 0;
+        }
+        else {
+            return $pass;
         }
     }
     return 0;    # no rules
@@ -366,7 +376,8 @@ sub crawl {
         find(
             {   wanted => sub {
 
-                    my $path = $File::Find::name;
+                    # canonpath cleans up any leading .
+                    my $path = File::Spec->canonpath($File::Find::name);
 
                     if (-d) {
                         unless ( $self->dir_ok( $path, [ stat(_) ] ) ) {
