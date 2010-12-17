@@ -342,6 +342,10 @@ sub _do_file {
     }
     else {
         $self->debug and warn "skipping file $file\n";
+        if ($self->verbose & 4) {
+            local $| = 1;
+            print "skipping $file\n";
+        }
     }
 }
 
@@ -381,6 +385,10 @@ sub crawl {
 
                     if (-d) {
                         unless ( $self->dir_ok( $path, [ stat(_) ] ) ) {
+                            if ( $self->verbose & 2 ) {
+                                local $| = 1;
+                                print "skipping $path\n";
+                            }
                             $File::Find::prune = 1;
                             return;
                         }
