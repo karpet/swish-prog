@@ -215,4 +215,4 @@ Revision history for Perl extension Prog.
         * fix MailFS aggregator to preserve filesystem paths as Doc url
 
 0.49    xxx
-        * fix some FileRules bugs with false negative matches
+        * refactor FileRules feature into File::Rules module
