@@ -220,3 +220,4 @@ Revision history for Perl extension Prog.
 0.50    xxx
         * make swish3 -N flag argument optional, defaulting to indexdir/swish_last_start
         * error check in base Indexer for valid invindex param
+        * misc doc fixes
