@@ -428,7 +428,7 @@ sub get_doc {
 =head2 crawl( I<uri> )
 
 Implements the required crawl() method. Recursively fetches I<uri>
-and its child links to a depth set in depth().
+and its child links to a depth set in max_depth().
 
 =cut
 
