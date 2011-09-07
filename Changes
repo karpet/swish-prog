@@ -224,3 +224,7 @@ Revision history for Perl extension Prog.
 
 0.51    28 June 2011
         * add 'Lucy' backend
+
+0.52    xxx
+        * add support for IndexFile config option
+

@@ -16,7 +16,7 @@ use overload(
     fallback => 1,
 );
 
-our $VERSION = '0.51';
+our $VERSION = '0.52';
 
 my $XML = Search::Tools::XML->new;
 
@@ -27,6 +27,10 @@ my %unique = map { $_ => 1 } qw(
     PropertyNames
     PropertyNamesNoStripChars
     IncludeConfigFile
+);
+
+my %takes_single_value = map { $_ => 1 } qw(
+    IndexFile
 );
 
 my @Opts = qw(
@@ -252,6 +256,9 @@ sub _get {
 
     if ( exists $unique{$key} ) {
         return $self->_name_hash($key);
+    }
+    elsif ( exists $takes_single_value{$key} ) {
+        return $self->{$key}->[0];
     }
     else {
         return $self->{$key};
@@ -555,10 +562,10 @@ sub ver2_to_ver3 {
     my $class = ref($self) || $self;
     my $config = $file ? $class->new->read2($file) : $self->as_hash;
     my $time = $no_timestamp ? '' : localtime();
-    
+
     # if we were not passed a file name, all the config resolution
     # has already been done, so do not perpetuate.
-    if (!$file) {
+    if ( !$file ) {
         delete $config->{IncludeConfigFile};
     }
 
@@ -686,7 +693,7 @@ KEY: for my $k ( sort keys %$config ) {
             for my $line (@args) {
                 my ( $parser_type, $tag, $len )
                     = ( $line =~ m/^(XML|HTML|TXT)[2\*]? +<(.+?)> ?(\d*)$/ );
-                if (!$tag) {
+                if ( !$tag ) {
                     warn "unparsed config2 line for StoreDescription: $line";
                     next;
                 }
