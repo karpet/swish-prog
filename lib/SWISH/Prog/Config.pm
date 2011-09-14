@@ -551,7 +551,6 @@ sub ver2_to_ver3 {
         IgnoreFirstChar
         IgnoreLastChar
         MaxDepth
-        ReplaceRules
         SpiderDirectory
         SwishProgParameters
         TmpDir
