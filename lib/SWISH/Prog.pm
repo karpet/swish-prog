@@ -81,9 +81,15 @@ my %ishort = (
 );
 
 sub init {
-    my $self   = shift;
-    my %arg    = @_;
-    my $filter = delete $arg{filter};    # no such method. just convenience.
+    my $self = shift;
+    my %arg  = @_;
+
+    # no such method. just convenience.
+    my $filter = delete $arg{filter};
+
+    # no such method, but pass through to Lucy if applicable.
+    my $highlightable_fields = delete $arg{highlightable_fields};
+
     $self->SUPER::init(%arg);
 
     # search mode requires only invindex
@@ -117,13 +123,20 @@ sub init {
         if ($@) {
             croak "invalid indexer $indexer: $@";
         }
-        $indexer = $indexer->new(
+        my %indexer_opts = (
             debug     => $self->debug,
             invindex  => $self->{invindex},    # may be undef
             verbose   => $self->verbose,
             config    => $config,              # may be undef
             test_mode => $self->test_mode,
         );
+        if ( $indexer->isa('SWISH::Prog::Lucy::Indexer') ) {
+            $indexer_opts{highlightable_fields} = $highlightable_fields;
+        }
+
+        $self->debug and warn "indexer opts: " . dump( \%indexer_opts );
+
+        $indexer = $indexer->new(%indexer_opts);
     }
     elsif ( !$indexer->isa('SWISH::Prog::Indexer') ) {
         croak "$indexer is not a SWISH::Prog::Indexer-derived object";
