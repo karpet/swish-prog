@@ -31,6 +31,7 @@ my %unique = map { $_ => 1 } qw(
 
 my %takes_single_value = map { $_ => 1 } qw(
     IndexFile
+    FuzzyIndexingMode
 );
 
 my @Opts = qw(
@@ -807,6 +808,16 @@ KEY: for my $k ( sort keys %$config ) {
                 $tag );
         }
     }
+    if ( $conf3{FuzzyIndexingMode} ) {
+        $xml .= sprintf(
+            "  <%s>%s</%s>\n",
+            "Stemmer",
+            $XML->escape(
+                $self->get_stemmer_lang( $conf3{FuzzyIndexingMode} )
+            ),
+            "Stemmer"
+        );
+    }
     $xml .= " </Index>\n";
 
     if ( keys %$mimes ) {
@@ -841,6 +852,23 @@ KEY: for my $k ( sort keys %$config ) {
 sub _make_tag {
     my ( $self, $tag, $attrs ) = @_;
     return $XML->tag_safe($tag) . $XML->attr_safe($attrs);
+}
+
+=head2 get_stemmer_lang([ I<fuzzymode> ])
+
+Returns the 2-letter language code for the Snowball stemmer
+corresponding to I<fuzzymode>. If I<fuzzymode> is not defined,
+calls FuzzyIndexingMode() method on the config object.
+
+=cut
+
+sub get_stemmer_lang {
+    my $self = shift;
+    my $lang = shift || $self->FuzzyIndexingMode;
+    if ( $lang and $lang =~ m/^Stemming_(\w\w)/ ) {
+        return $1;
+    }
+    return 'none';
 }
 
 sub AUTOLOAD {

@@ -229,4 +229,5 @@ Revision history for Perl extension Prog.
         * add support for IndexFile config option
         * add --lucy_highlightable option to swish3
         * new class SWISH::Prog::ReplaceRules for backcompat
+        * add get_stemmer_lang() method to Config class for Snowball stemmer forward-compat.
 
