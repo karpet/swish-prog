@@ -140,7 +140,7 @@ sub init {
 =head2 uri_ok( I<uri> )
 
 Returns true if I<uri> is acceptable for including in an index.
-The 'ok-ness' of the I<uri> is based on it's base, robot rules,
+The 'ok-ness' of the I<uri> is based on its base, robot rules,
 and the spider configuration.
 
 =cut
