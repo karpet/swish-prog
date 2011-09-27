@@ -156,6 +156,12 @@ sub init {
             }
             for my $colname ( keys %$cols ) {
                 my $desc = $cols->{$colname};
+                if ( $colname eq 'swishtitle' ) {
+                    if ( ref $desc ) {
+                        croak "swishtitle must be a column name string";
+                    }
+                    next;
+                }
                 unless ( ref($desc) eq 'HASH' ) {
                     croak "$colname description must be a hashref";
                 }
@@ -177,8 +183,11 @@ sub init {
         for my $table ( keys %{ $self->{schema} } ) {
             my $columns = $self->{schema}->{$table};
             my %ranks;
-            push( @{ $ranks{ $columns->{$_}->{bias} } }, $_ )
-                for sort keys %$columns;
+            for my $col ( sort keys %$columns ) {
+                next if $col eq 'swishtitle';
+                next if $col eq 'swishdescription';
+                push( @{ $ranks{ $columns->{$col}->{bias} } }, $col );
+            }
 
             for my $rank ( keys %ranks ) {
                 $self->config->MetaNamesRank(
@@ -194,7 +203,9 @@ sub init {
             'swishdefault '
                 . join( ' ',
                 map { '_' . $_ . '_row' }
-                sort keys %{ $self->{schema} } ),
+                    sort
+                    grep { $_ ne 'swishtitle' and $_ ne 'swishdescription' }
+                    keys %{ $self->{schema} } ),
             1    # always append
         );
     }
@@ -225,7 +236,9 @@ T: for my $table (@tables) {
         my $table_info = $self->{schema}->{$table};
 
         # which columns to index
-        my @cols = sort keys %$table_info;
+        my @cols
+            = sort grep { $_ ne 'swishtitle' and $_ ne 'swishdescription' }
+            keys %$table_info;
 
         # special col names
         my $desc  = delete( $table_info->{swishdescription} ) || {};

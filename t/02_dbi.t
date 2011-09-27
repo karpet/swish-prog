@@ -62,6 +62,8 @@ SKIP: {
                     myint  => { type => 'int', bias => 10 },
                     mychar => { type => 'char' },
                     mydate => { type => 'date' },
+                    swishtitle       => 'id',
+                    swishdescription => { mychar => 1, mydate => 1 },
                 }
             },
         ),
