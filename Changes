@@ -231,3 +231,7 @@ Revision history for Perl extension Prog.
         * new class SWISH::Prog::ReplaceRules for backcompat
         * add get_stemmer_lang() method to Config class for Snowball stemmer forward-compat.
 
+0.53    xxx
+        * fix DBI Aggregator to make code support docs for swishtitle and swishdescription.
+          Bug reported by Logan Bell.
+
