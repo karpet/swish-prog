@@ -288,7 +288,7 @@ sub _do_table {
             url     => ++$counter,
             modtime => time(),
             parser  => 'XML*',
-            type    => 'application/x-swish-dbi',    # TODO ??
+            type    => 'application/xml',
             data    => $row
         );
 
