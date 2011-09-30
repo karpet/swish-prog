@@ -17,6 +17,9 @@ sub init {
     my $self = shift;
     $self->SUPER::init(@_);
     $self->{file} ||= $self->invindex->path->file('swish.xml');
+    if (!-s $self->{file}) {
+        confess("No such file: $self->{file}");
+    }
     $self->{data} = XMLin("$self->{file}");
 
     #warn Data::Dump::dump( $self->{data} );
