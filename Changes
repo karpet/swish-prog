@@ -237,3 +237,5 @@ Revision history for Perl extension Prog.
         * fix FS Aggregator behavior to work like 2.x and not skip files with no extension.
         * fix bug in swish3 where index dir is not created before swish_last_start is touched.
         * confess() when swish.xml does not exist
+        * base Aggregator class no longer requires an indexer in new().
+
