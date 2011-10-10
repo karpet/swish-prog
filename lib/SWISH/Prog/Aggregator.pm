@@ -131,13 +131,6 @@ sub init {
     $self->{__progress_so_far} = 0;
     $self->{__progress_next}   = 0;
 
-    if (   !$self->{indexer}
-        or !blessed( $self->{indexer} )
-        or !$self->{indexer}->isa('SWISH::Prog::Indexer') )
-    {
-        croak "SWISH::Prog::Indexer-derived object required to crawl()";
-    }
-
     $self->{doc_class} ||= 'SWISH::Prog::Doc';
     $self->{swish_filter_obj} ||= SWISH::Filter->new;
 
