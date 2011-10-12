@@ -239,3 +239,5 @@ Revision history for Perl extension Prog.
         * confess() when swish.xml does not exist
         * base Aggregator class no longer requires an indexer in new().
 
+0.54    xxx
+        * $SWISH::Prog::Utils::DefaultExtension now let's you configure default file extension
