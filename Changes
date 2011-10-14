@@ -241,3 +241,5 @@ Revision history for Perl extension Prog.
 
 0.54    xxx
         * $SWISH::Prog::Utils::DefaultExtension now let's you configure default file extension
+        * fix SWISH::Prog::Config->new() to support perldoc's claims of passing in a hashref
+          or named attribute pairs.
