@@ -239,7 +239,7 @@ elsif ( $Opt->{query} ) {
     my $searcher   = $sclass->new( invindex => $invindex->path . '', );
     my $start_time = Time::HiRes::time();
     my $results    = $searcher->search(
-        $Opt->{query},
+        to_utf8($Opt->{query}),
         {   start       => $Opt->{begin},
             max         => $Opt->{max},
             limit       => parse_limits( $Opt->{Limit} ),
