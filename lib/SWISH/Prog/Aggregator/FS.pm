@@ -4,10 +4,10 @@ use warnings;
 use base qw( SWISH::Prog::Aggregator );
 
 use Carp;
-use File::Slurp;
 use File::Find;
 use File::Rules;
 use Data::Dump qw( dump );
+use Search::Tools;
 
 our $VERSION = '0.60';
 
@@ -66,13 +66,6 @@ sub init {
     }
     else {
         $self->{_ext_re} = $SWISH::Prog::Utils::ExtRE;
-    }
-
-    # if running with SWISH::3,
-    # instantiate for the slurp advantage
-    eval "use SWISH::3 0.09";
-    if ( !$@ ) {
-        $self->{_swish3} = SWISH::3->new;
     }
 
 }
@@ -195,25 +188,12 @@ sub get_doc {
     my ( $stat, $ext ) = @_;
     my $buf;
 
-    # the SWISH::3->slurp is about 50% faster
-    # but obviously only available if SWISH::3 is loaded.
-    # It also handles .gz files transparently based on .gz
-    # extension, so must remove the extension to avoid
-    # double-unzip via SWISH::Filter.
-
     # NOTE we always read in binary (raw) mode in case
     # the file is compressed, binary, etc.
-    if ( $self->{_swish3} ) {
-
-        #warn "$url using swish3->slurp\n";
-        eval {
-            $buf = $self->{_swish3}->slurp( $url, 1 );
-            $url =~ s/\.gz$//;    # post-slurp, in case it failed.
-        };
-    }
-    else {
-        eval { $buf = read_file( $url, binmode => ':raw' ) };
-    }
+    eval {
+        $buf = Search::Tools->slurp($url);
+        $url =~ s/\.gz$//;    # post-slurp, in case it failed.
+    };
 
     if ($@) {
         carp "unable to read $url - skipping";

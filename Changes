@@ -261,4 +261,4 @@ Revision history for Perl extension Prog.
 
 0.60    xxx
         * add *_property methods to InvIndex::Meta
-
+        * SWISH::3 now required dependency
