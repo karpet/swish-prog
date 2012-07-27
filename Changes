@@ -259,3 +259,6 @@ Revision history for Perl extension Prog.
 0.59    26 July 2012
         * add FollowXInclude support for Swish3
 
+0.60    xxx
+        * add *_property methods to InvIndex::Meta
+
