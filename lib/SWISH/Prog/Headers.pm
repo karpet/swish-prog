@@ -91,16 +91,16 @@ SWISH::Prog::Headers - create document headers for Swish-e -S prog
 =head1 SYNOPSIS
 
   use SWISH::Prog::Headers;
-  use Search::Tools;
+  use SWISH::3;
   my $f = 'some/file.html';
-  my $buf = Search::Tools->slurp( $f ):
+  my $buf = SWISH::3->slurp( $f ):
   my $headers = SWISH::Prog::Headers->new;
   print $headers->head( $buf, { url=>$f } ), $buf;
 
 =head1 DESCRIPTION
 
 SWISH::Prog::Headers generates the correct headers
-for feeding documents to the Swish-e indexer.
+for feeding documents to the indexer.
 
 =head1 VARIABLES
 

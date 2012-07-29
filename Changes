@@ -262,3 +262,6 @@ Revision history for Perl extension Prog.
 0.60    xxx
         * add *_property methods to InvIndex::Meta
         * SWISH::3 now required dependency
+        * added use_quotes and quote_char features to Aggregator::DBI, inspired by patch from
+          Miko O'Sullivan.
+
