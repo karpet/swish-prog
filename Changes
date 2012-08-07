@@ -265,3 +265,6 @@ Revision history for Perl extension Prog.
         * added use_quotes and quote_char features to Aggregator::DBI, inspired by patch from
           Miko O'Sullivan.
 
+0.61    xxx
+        * swish3 now catches exceptions and re-throws errors
+
