@@ -267,4 +267,4 @@ Revision history for Perl extension Prog.
 
 0.61    xxx
         * swish3 now catches exceptions and re-throws errors
-
+        * swish3 now passes --debug flag into Searcher->new
