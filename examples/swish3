@@ -240,7 +240,10 @@ elsif ( $Opt->{query} ) {
     my $sclass   = "SWISH::Prog::${format}::Searcher";
     eval "require $sclass";
     croak $@ if $@;
-    my $searcher = $sclass->new( invindex => $invindex->path . '', );
+    my $searcher = $sclass->new(
+        invindex => $invindex->path . '',
+        debug    => $Opt->{debug},
+    );
     my $start_time = Time::HiRes::time();
     my $results;
     eval {
