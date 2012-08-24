@@ -226,7 +226,6 @@ if ( $Opt->{input} ) {
     $prog->aggregator->set_parser_from_type(1);
 
     $prog->indexer->invindex->path->mkpath( $Opt->{debug} );
-    $prog->indexer->invindex->path->file('swish_last_start')->touch();
     my $start    = time();
     my $num_docs = $prog->index(@ARGV);
     my $end      = time();
