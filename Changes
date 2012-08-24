@@ -272,3 +272,5 @@ Revision history for Perl extension Prog.
           to run one format's Indexer against a different format's index.
         * swish_last_start file now created by base Indexer class, not swish3 cli.
 
+0.62    xxx
+        * support subclassing of Indexer in start() sanity check introduced in 0.61
