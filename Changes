@@ -274,3 +274,4 @@ Revision history for Perl extension Prog.
 
 0.62    xxx
         * support subclassing of Indexer in start() sanity check introduced in 0.61
+        * add InvIndex->meta_file method and avoid referring to swish.xml directly
