@@ -5,7 +5,7 @@ use base qw( SWISH::Prog::Class );
 use Carp;
 use Scalar::Util qw( blessed );
 
-our $VERSION = '0.61_01';
+our $VERSION = '0.62';
 
 __PACKAGE__->mk_accessors(
     qw(
