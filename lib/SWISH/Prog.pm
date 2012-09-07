@@ -171,6 +171,11 @@ sub init {
     $self->{aggregator} = $aggregator;
     $self->{indexer}    = $indexer;
 
+    # allow filter to be a file containing a sub ref
+    if ( $filter and -f $filter ) {
+        $filter = do $filter;
+    }
+
     if ( $self->config and $self->config->ReplaceRules ) {
 
         # create a CODE ref that uses the ReplaceRules

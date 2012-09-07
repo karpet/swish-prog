@@ -278,4 +278,4 @@ Revision history for Perl extension Prog.
 
 0.63    xxx
         * add TagAlias support to Config. TagAlias is a Swish3 feature.
-
+        * add --doc_filter to swish3, to allow for set_filter to work from an external Perl file.
