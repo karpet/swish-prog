@@ -5,7 +5,7 @@ use 5.008003;
 
 name 'SWISH-Prog';
 all_from 'lib/SWISH/Prog.pm';
-requires 'Search::Tools'      => '0.43';
+requires 'Search::Tools'      => '0.82';
 requires 'File::Basename'     => 0;
 requires 'Time::HiRes'        => 0;
 requires 'MIME::Types'        => 0;
