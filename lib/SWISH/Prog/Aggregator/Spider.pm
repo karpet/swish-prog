@@ -15,7 +15,7 @@ __PACKAGE__->mk_accessors(
 
 #use LWP::Debug qw(+);
 
-our $VERSION = '0.63';
+our $VERSION = '0.63_01';
 
 # TODO make these configurable
 my %parser_types = %SWISH::Prog::Utils::ParserTypes;
@@ -69,7 +69,7 @@ been fetched already.
 
 =item md5_cache 
 
-If use_md5() is true, this SWISH::Prog::cache-derived object tracks
+If use_md5() is true, this SWISH::Prog::Cache-derived object tracks
 the URI fingerprints.
 
 =item queue 
@@ -268,7 +268,7 @@ sub _get_basic_credentials {
     # Exists but undefined means don't ask.
     return
         if exists $server->{credential_timeout}
-            && !defined $server->{credential_timeout};
+        && !defined $server->{credential_timeout};
 
     # Exists but undefined means don't ask.
 
@@ -377,7 +377,7 @@ sub get_doc {
                 ? $ua->title || "No title: $use_uri"
                 : $use_uri
         : "Failed: $use_uri",
-        ct => $ua->success ? $ua->ct : "Unknown",
+            ct => $ua->success ? $ua->ct : "Unknown",
     };
 
     my $response = $ua->response;
