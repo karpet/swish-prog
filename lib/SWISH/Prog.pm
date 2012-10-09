@@ -284,6 +284,31 @@ sub init {
     return $self;
 }
 
+=head2 filter( I<CODE ref> )
+
+Set in new(). See L<SWISH::Prog::Doc>.
+
+Example:
+
+ my $prog = SWISH::Prog->new(
+     filter => {
+        my $doc = shift;
+    
+        # alter url
+        my $url = $doc->url;
+        $url =~ s/my.foo.com/my.bar.org/;
+        $doc->url( $url );
+    
+        # alter content
+        my $buf = $doc->content;
+        $buf =~ s/foo/bar/gi;
+        $doc->content( $buf );
+    }
+ );
+
+The I<filter> value can also be the name of a file
+that evals to a CODE ref.
+ 
 =head2 aggregator( I<$swish_prog_aggregator> )
 
 Get the SWISH::Prog::Aggregator object. You should set this in new().

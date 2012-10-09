@@ -149,6 +149,7 @@ sub uri_ok {
     my $self = shift;
     my $uri  = shift or croak "URI required";
     my $str  = $uri->canonical->as_string;
+    $str =~ s/#.*//;    # target anchors create noise
     return 0 if $self->{_uri_ok_cache}->has($str);
     $self->{_uri_ok_cache}->add($str);
 
@@ -187,9 +188,10 @@ sub _add_links {
 
     for my $l (@links) {
         my $uri = $l->url_abs or next;
-
-        next if $self->uri_cache->has($uri);    # check only once
-        $self->uri_cache->add( $uri => $self->{_current_depth} );
+        my $uri_str = $uri;
+        $uri_str =~ s/#.*//;         # target anchors create noise
+        next if $self->uri_cache->has($uri_str);    # check only once
+        $self->uri_cache->add( $uri_str => $self->{_current_depth} );
 
         if ( $self->uri_ok($uri) ) {
             $self->queue->put($uri);
@@ -372,12 +374,15 @@ sub get_doc {
         status  => $ua->status,
         success => $ua->success,
         is_html => $ua->is_html,
-        title   => $ua->success
-        ? $ua->is_html
-                ? $ua->title || "No title: $use_uri"
+        title   => (
+            $ua->success
+            ? ( $ua->is_html
+                ? ( $ua->title || "No title: $use_uri" )
                 : $use_uri
-        : "Failed: $use_uri",
-            ct => $ua->success ? $ua->ct : "Unknown",
+                )
+            : "Failed: $use_uri"
+        ),
+        ct => ( $ua->success ? $ua->ct : "Unknown" ),
     };
 
     my $response = $ua->response;
@@ -404,7 +409,7 @@ sub get_doc {
         $charset =~ s/;?$meta->{ct};?//;
         my %doc = (
             url     => $meta->{org_uri},
-            modtime => $headers->last_modified || $headers->date,
+            modtime => ( $headers->last_modified || $headers->date ),
             type    => $meta->{ct},
             content => $buf,
             size => $headers->content_length || length( pack 'C0a*', $buf ),
