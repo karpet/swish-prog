@@ -283,3 +283,6 @@ Revision history for Perl extension Prog.
 
 0.64    xxx
         * add --aggregator_opts to swish3 and SWISH::Prog
+        * add looks_like_feed() to Spider, and add dependency on XML::Feed
+        * switch Spider::UA parent class to WWW::Mechanize::GZip
+
