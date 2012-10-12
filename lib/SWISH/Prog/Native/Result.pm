@@ -20,7 +20,7 @@ __PACKAGE__->mk_accessors(
         )
 );
 
-our $VERSION = '0.63_01';
+our $VERSION = '0.64';
 
 =head1 NAME
 
