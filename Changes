@@ -286,3 +286,5 @@ Revision history for Perl extension Prog.
         * add looks_like_feed() to Spider, and add dependency on XML::Feed
         * switch Spider::UA parent class to WWW::Mechanize::GZip
 
+0.65    xxx
+        * add more tests for MailFS aggregator
