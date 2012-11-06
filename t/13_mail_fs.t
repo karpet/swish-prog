@@ -10,6 +10,7 @@ use strict;
 use warnings;
 use Test::More tests => 10;
 use Path::Class::Dir;
+use Data::Dump qw( dump );
 
 use_ok('SWISH::Prog::Native::Indexer');
 
@@ -22,8 +23,11 @@ SKIP: {
     }
 
     # is executable present?
-    my $indexer
-        = SWISH::Prog::Native::Indexer->new( 'invindex' => 't/mail.index', );
+    my $indexer = SWISH::Prog::Native::Indexer->new(
+        verbose    => $ENV{PERL_DEBUG},
+        debug      => $ENV{PERL_DEBUG},
+        'invindex' => 't/mail.index',
+    );
     if ( !$indexer->swish_check ) {
         skip "swish-e not installed", 9;
     }
@@ -31,9 +35,12 @@ SKIP: {
     ok( my $mail = SWISH::Prog::Aggregator::MailFS->new(
             indexer => $indexer,
             verbose => $ENV{PERL_DEBUG},
+            debug   => $ENV{PERL_DEBUG},
         ),
         "new mail aggregator"
     );
+
+    $ENV{PERL_DEBUG} and diag( dump($mail) );
 
     ok( $mail->indexer->start, "start" );
     is( $mail->crawl('t/mailfs'), 1, "crawl" );
