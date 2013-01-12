@@ -37,7 +37,12 @@ sleep() I<delay> seconds before fetching I<uri>.
 
 =cut
 
-my $can_accept = HTTP::Message::decodable;
+# if Compress::Zlib is installed, this should handle gzip transparently.
+# thanks to
+# http://stackoverflow.com/questions/1285305/how-can-i-accept-gzip-compressed-content-using-lwpuseragent
+my $can_accept = HTTP::Message::decodable();
+
+#warn "Accept-Encoding: $can_accept\n";
 
 our $Debug = 0;
 
