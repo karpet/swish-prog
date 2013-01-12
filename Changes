@@ -294,3 +294,8 @@ Revision history for Perl extension Prog.
 0.66    8 Dec 2012
         * yanked redundant test t/09 as it is now part of Search::Tools
         * fix t/05 spider to warn on correct missing module; fix spider count
+
+0.67    xxx
+        * Spider now uses LWP::RobotUA to respect robots.txt. Dependency on WWW::Mechanize is
+          removed.
+

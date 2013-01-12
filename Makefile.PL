@@ -28,7 +28,10 @@ requires 'SWISH::3'           => 1.000005;
 
 # FF should be part of base install just like Carp
 recommends 'File::Find'           => 0;
-recommends 'WWW::Mechanize::GZip' => 0;
+recommends 'LWP::RobotUA'         => 0;
+recommends 'HTML::Tagset'         => 0;
+recommends 'HTML::LinkExtor'      => 0;
+recommends 'HTTP::Message'        => 0;
 recommends 'XML::Feed'            => 0;
 recommends 'URI'                  => 0;
 recommends 'SWISH::API::Object'   => 0.13;     # native searcher requires

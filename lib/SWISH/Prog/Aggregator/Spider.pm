@@ -13,11 +13,23 @@ use Search::Tools::UTF8;
 use XML::Feed;
 
 __PACKAGE__->mk_accessors(
-    qw( use_md5 uri_cache md5_cache queue ua max_depth delay timeout ));
+    qw(
+        agent
+        email
+        use_md5
+        uri_cache
+        md5_cache
+        queue
+        ua
+        max_depth
+        delay
+        timeout
+        )
+);
 
 #use LWP::Debug qw(+);
 
-our $VERSION = '0.66';
+our $VERSION = '0.67';
 
 # TODO make these configurable
 my %parser_types = %SWISH::Prog::Utils::ParserTypes;
@@ -45,7 +57,7 @@ SWISH::Prog::Aggregator::Spider - web aggregator
 
 SWISH::Prog::Aggregator::Spider is a web crawler similar to
 the spider.pl script in the Swish-e 2.4 distribution. Internally,
-SWISH::Prog::Aggregator::Spider uses WWW::Mechanize to the hard work.
+SWISH::Prog::Aggregator::Spider uses LWP::RobotUA to the hard work.
 See SWISH::Prog::Aggregator::Spider::UA.
 
 =head1 METHODS
@@ -57,6 +69,14 @@ See SWISH::Prog::Aggregator
 All I<params> have their own get/set methods too. They include:
 
 =over
+
+=item agent
+
+Get/set the user-agent string reported by the user agent.
+
+=item email
+
+Get/set the email string reported by the user agent.
 
 =item use_md5 
 
@@ -111,7 +131,7 @@ sub init {
     $self->SUPER::init(@_);
 
     # defaults
-    $self->{agent}         ||= 'swish-e http://swish-e.org/';
+    $self->{agent}         ||= 'swish-prog-spider http://swish-e.org/';
     $self->{email}         ||= 'swish@user.failed.to.set.email.invalid';
     $self->{max_wait_time} ||= 30;
     $self->{max_size}      ||= 5_000_000;
@@ -123,10 +143,11 @@ sub init {
     $self->{uri_cache} ||= SWISH::Prog::Cache->new;
     $self->{_uri_ok_cache} = SWISH::Prog::Cache->new;
     $self->{_auth_cache}   = SWISH::Prog::Cache->new;  # ALWAYS inmemory cache
-    $self->{ua}
-        ||= SWISH::Prog::Aggregator::Spider::UA->new( stack_depth => 0 );
+    $self->{ua} ||= SWISH::Prog::Aggregator::Spider::UA->new( $self->{agent},
+        $self->{email}, );
 
     $self->{timeout} = 10 unless defined $self->{timeout};
+    $self->{ua}->delay( $self->{delay} / 60 );
     $self->{ua}->timeout( $self->{timeout} );
 
     $self->{_current_depth} = 1;
@@ -172,7 +193,6 @@ sub uri_ok {
     }
 
     # TODO
-    # check robot rules
     # check regex
 
     return 1;
@@ -189,7 +209,7 @@ sub _add_links {
     $self->{_parent} ||= $parent;    # first time.
 
     for my $l (@links) {
-        my $uri = $l->url_abs or next;
+        my $uri = $l->abs( $self->{_base} ) or next;
         my $uri_str = $uri;
         $uri_str =~ s/#.*//;         # target anchors create noise
         next if $self->uri_cache->has($uri_str);    # check only once
@@ -272,7 +292,7 @@ sub _get_basic_credentials {
     # Exists but undefined means don't ask.
     return
         if exists $server->{credential_timeout}
-            && !defined $server->{credential_timeout};
+        && !defined $server->{credential_timeout};
 
     # Exists but undefined means don't ask.
 
@@ -344,25 +364,10 @@ sub get_doc {
     # get our useragent
     my $ua = $self->ua;
 
-    # figure out our delay between requests
-    my $delay = 0;
-    if ( $self->{keep_alive_connection} ) {
-        $delay = 0;
-    }
-    elsif ( !$self->{delay} || !$self->{_last_response_time} ) {
-        $delay = 0;
-    }
-    else {
-        $delay = $self->{delay} - ( time() - $self->{_last_response_time} );
-    }
+    warn "get $uri [depth: $depth]\n" if $self->verbose;
 
-    warn "get $uri (delay: $delay  depth: $depth)\n" if $self->verbose;
-
-    # fetch the uri, waiting $delay seconds before trying.
-    $ua->get( $uri, $delay );
-
-    # flag current time for next delay calc.
-    $self->{_last_response_time} = time();
+    # fetch the uri. $ua handles delay internally.
+    $ua->get($uri);
 
     # add its links to the queue.
     # If the resource looks like an XML feed of some kind,
@@ -370,7 +375,7 @@ sub get_doc {
     if ( my $feed = $self->looks_like_feed( $ua->response ) ) {
         my @links;
         for my $entry ( $feed->entries ) {
-            push @links, WWW::Mechanize::Link->new( { url => $entry->link } );
+            push @links, URI->new( $entry->link );
         }
         $self->_add_links( $uri, @links );
 
@@ -439,13 +444,13 @@ sub get_doc {
     elsif ( $response->code == 401 ) {
 
         # TODO get auth
-        warn $response->status_line;
+        warn sprintf( "%s : %s\n", $uri, $response->status_line );
         return $response->code;
 
     }
     else {
 
-        warn $response->status_line;
+        warn sprintf( "%s : %s\n", $uri, $response->status_line );
         return $response->code;
     }
 

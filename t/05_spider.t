@@ -10,7 +10,7 @@ SKIP: {
     }
 
     eval "use SWISH::Prog::Aggregator::Spider";
-    if ( $@ && $@ =~ m/(WWW::Mechanize[:\w]*)/ ) {
+    if ( $@ && $@ =~ m/([\w:]+)/ ) {
         skip "$1 required for spider test: $@", 3;
     }
 
@@ -34,6 +34,6 @@ SKIP: {
     );
 
     diag("spidering swish-e.org/docs");
-    is( $spider->crawl('http://www.swish-e.org/docs/'), 29, "crawl" );
+    is( $spider->crawl('http://www.swish-e.org/docs/'), 26, "crawl" );
 
 }
