@@ -31,9 +31,13 @@ LWP::RobotUA.
 
 =head1 METHODS
 
-=head2 get( I<uri>, I<delay> )
+=head2 get( I<args> )
 
-sleep() I<delay> seconds before fetching I<uri>.
+I<args> is an array of key/value pairs. I<uri> is required.
+
+I<delay> will sleep() I<delay> seconds before fetching I<uri>.
+
+Also supported: I<user> and I<pass> for authorization.
 
 =cut
 
@@ -44,14 +48,30 @@ my $can_accept = HTTP::Message::decodable();
 
 #warn "Accept-Encoding: $can_accept\n";
 
-our $Debug = 0;
+our $Debug = $ENV{PERL_DEBUG};
 
 sub get {
-    my $self = shift;
-    my $uri  = shift or croak "URI required";
-    my $resp = $self->SUPER::get( $uri, 'Accept-Encoding' => $can_accept, );
+    my $self  = shift;
+    my %args  = @_;
+    my $uri   = $args{uri} or croak "URI required";
+    my $delay = $args{delay} || 0;
+
+    sleep($delay) if $delay;
+
+    my $request = HTTP::Request->new( 'GET' => $uri );
+    $request->header( 'Accept-Encoding' => $can_accept, );
+    if ( $args{user} and $args{pass} ) {
+        $request->authorization_basic( $args{user}, $args{pass} );
+    }
+
+    $Debug and dump $request;
+
+    my $resp = $self->request($request);
     $self->{_swish_last_uri}  = URI->new($uri);
     $self->{_swish_last_resp} = $resp;
+    
+    $Debug and dump $resp;
+    
     return $resp;
 }
 
@@ -103,7 +123,10 @@ Shortcut for $ua->response->header('content-type').
 =cut
 
 sub ct {
-    return shift->response->header('content-type');
+    my $self = shift;
+    my $ct   = $self->response->header('content-type');
+    $ct =~ s/;.+// if $ct;
+    return $ct;
 }
 
 =head2 is_html
