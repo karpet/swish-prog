@@ -298,4 +298,5 @@ Revision history for Perl extension Prog.
 0.67    xxx
         * Spider now uses LWP::RobotUA to respect robots.txt. Dependency on WWW::Mechanize is
           removed.
+        * Spider authorization features now work. Added bona fide test suite for spidering.
 
