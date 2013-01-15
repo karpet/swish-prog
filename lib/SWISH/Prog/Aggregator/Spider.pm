@@ -763,13 +763,28 @@ sub _make_request {
     elsif ( $response->code == 401 ) {
 
         # authorize and try again
-        warn sprintf( "%s : %s\n", $uri, $response->status_line );
+        warn sprintf( "%s [retrying, %s]\n", $uri, $response->status_line );
         return $self->get_authorized_doc( $uri, $response )
             || $response->code;
     }
+    elsif ($response->code == 403
+        && $response->status_line =~ m/robots.txt/ )
+    {
+
+        # ignore
+        warn sprintf( "%s [skipped, %s]\n", $uri, $response->status_line );
+        return $self->get_authorized_doc( $uri, $response )
+            || $response->code;
+    }
+    elsif ( $response->code == 403 ) {
+
+        # authorize and try again
+        warn sprintf( "%s [retrying, %s]\n", $uri, $response->status_line );
+        return $self->get_authorized_doc( $uri, $response );
+    }
     else {
 
-        warn sprintf( "%s : %s\n", $uri, $response->status_line );
+        warn sprintf( "%s [%s]\n", $uri, $response->status_line );
         return $response->code;
     }
 

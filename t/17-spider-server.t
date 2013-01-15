@@ -8,11 +8,6 @@ my $num_tests = 4;
 
 SKIP: {
 
-    if ( !$ENV{TEST_SPIDER} ) {
-        diag "set TEST_SPIDER env var to test the spider";
-        skip "set TEST_SPIDER env var to test the spider", $num_tests;
-    }
-
     eval "use SWISH::Prog::Aggregator::Spider";
     if ( $@ && $@ =~ m/([\w:]+)/ ) {
         skip "$1 required for spider test: $@", $num_tests;
