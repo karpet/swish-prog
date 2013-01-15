@@ -48,7 +48,7 @@ my $can_accept = HTTP::Message::decodable();
 
 #warn "Accept-Encoding: $can_accept\n";
 
-our $Debug = $ENV{PERL_DEBUG};
+our $Debug = $ENV{PERL_DEBUG} || 0;
 
 sub set_link_tags {
     my $self = shift;
@@ -69,13 +69,13 @@ sub get {
         $request->authorization_basic( $args{user}, $args{pass} );
     }
 
-    $Debug and dump $request;
+    ( $Debug & 2 ) and dump $request;
 
     my $resp = $self->request($request);
     $self->{_swish_last_uri}  = URI->new($uri);
     $self->{_swish_last_resp} = $resp;
 
-    $Debug and dump $resp;
+    ( $Debug & 2 ) and dump $resp;
 
     return $resp;
 }
