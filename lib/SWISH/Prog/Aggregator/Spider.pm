@@ -511,7 +511,13 @@ sub get_doc {
 
     $self->{_cur_depth} = $depth;
 
-    return $self->_make_request($uri);
+    my $doc = $self->_make_request($uri);
+
+    if ($doc) {
+        $self->queue->remove($uri);
+    }
+
+    return $doc;
 }
 
 =head2 get_authorized_doc( I<uri>, I<response> )
