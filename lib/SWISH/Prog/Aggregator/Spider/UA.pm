@@ -11,6 +11,17 @@ use Carp;
 use Data::Dump qw( dump );
 use Search::Tools::UTF8;
 
+our $VERSION = '0.67';
+
+# if Compress::Zlib is installed, this should handle gzip transparently.
+# thanks to
+# http://stackoverflow.com/questions/1285305/how-can-i-accept-gzip-compressed-content-using-lwpuseragent
+my $can_accept = HTTP::Message::decodable();
+
+#warn "Accept-Encoding: $can_accept\n";
+
+our $Debug = $ENV{PERL_DEBUG} || 0;
+
 =pod
 
 =head1 NAME
@@ -31,6 +42,8 @@ LWP::RobotUA.
 
 =head1 METHODS
 
+=cut
+
 =head2 get( I<args> )
 
 I<args> is an array of key/value pairs. I<uri> is required.
@@ -40,20 +53,6 @@ I<delay> will sleep() I<delay> seconds before fetching I<uri>.
 Also supported: I<user> and I<pass> for authorization.
 
 =cut
-
-# if Compress::Zlib is installed, this should handle gzip transparently.
-# thanks to
-# http://stackoverflow.com/questions/1285305/how-can-i-accept-gzip-compressed-content-using-lwpuseragent
-my $can_accept = HTTP::Message::decodable();
-
-#warn "Accept-Encoding: $can_accept\n";
-
-our $Debug = $ENV{PERL_DEBUG} || 0;
-
-sub set_link_tags {
-    my $self = shift;
-    $self->{_swish_link_tags} = shift;
-}
 
 sub get {
     my $self  = shift;
@@ -80,6 +79,16 @@ sub get {
     return $resp;
 }
 
+=head2 head( I<args> )
+
+Like get(), I<args> is an array of key/value pairs. I<uri> is required.
+
+I<delay> will sleep() I<delay> seconds before fetching I<uri>.
+
+Also supported: I<user> and I<pass> for authorization.
+
+=cut
+
 sub head {
     my $self  = shift;
     my %args  = @_;
@@ -102,6 +111,12 @@ sub head {
 
     return $resp;
 }
+
+=head2 redirect_ok
+
+Returns 0 (false) to override parent class behavior.
+
+=cut
 
 sub redirect_ok {
     return 0;    # do not follow any redirects
@@ -250,6 +265,18 @@ sub links {
 
     }
     return @links;
+}
+
+=head2 set_link_tags( I<hashref> )
+
+Set hashref of tags considered valid "links". Used by the links()
+method. This method is used internally by the Spider class.
+
+=cut
+
+sub set_link_tags {
+    my $self = shift;
+    $self->{_swish_link_tags} = shift;
 }
 
 =head2 title
