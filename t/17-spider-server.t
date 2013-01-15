@@ -2,6 +2,7 @@
 use strict;
 use warnings;
 use Test::More tests => 4;
+use HTTP::Date;
 
 my $num_tests = 4;
 
@@ -51,6 +52,7 @@ SKIP: {
 
         package MyServer;
         use Data::Dump qw( dump );
+        use HTTP::Date;
         use base ( 'Test::HTTP::Server::Simple',
             'HTTP::Server::Simple::Authen',
             'HTTP::Server::Simple::CGI' );
@@ -63,6 +65,9 @@ SKIP: {
             '/secret/more'       => \&resp_hello,
             '/redirect/local'    => [ 307, '/target' ],
             '/redirect/loopback' => [ 307, 'http://127.0.0.1/hello' ],
+            '/old/page'          => \&resp_old_page,
+            '/size/big'          => \&resp_big_page,
+            '/img/test'          => \&resp_img,
             '/redirect/elsewhere' =>
                 [ 307, 'http://somewherefaraway.net/donotfollow' ],
         );
@@ -101,6 +106,8 @@ SKIP: {
         sub resp_root {
             my $cgi = shift;
             print $cgi->header, $cgi->start_html,
+                qq(<a href="#">recursive anchor</a>),
+                qq(<a href="/">root</a>),
                 qq(<a href="hello">follow me</a>),
                 qq(<a href="secret">secret</a>),
                 qq(<a href="nosuchlink">404</a>),
@@ -109,6 +116,31 @@ SKIP: {
                 qq(<a href="redirect/local">redirect local</a>),
                 qq(<a href="redirect/loopback">redirect loopback</a>),
                 qq(<a href="redirect/elsewhere">redirect elsewhere</a>),
+                qq(<a href="old/page">old and in the way</a>),
+                qq(<a href="size/big">big file</a>),
+                qq(<img src="img/test" />),
+                $cgi->end_html;
+        }
+
+        sub resp_big_page {
+            my $cgi = shift;
+            print "Content-Length: 8192\r\n";
+            print $cgi->header;
+            print 'i am a really big file';
+
+        }
+
+        sub resp_img {
+            my $cgi = shift;
+            print $cgi->header('image/jpeg');
+            print 'thisisanimage.heh';
+        }
+
+        sub resp_old_page {
+            my $cgi = shift;
+            printf( "Last-Modified: %s\r\n", time2str( time() - 86400 ) )
+                ;    # yesterday
+            print $cgi->header, $cgi->start_html, 'this page is old',
                 $cgi->end_html;
         }
 
@@ -159,13 +191,16 @@ SKIP: {
             agent   => 'swish-prog-test',
 
             #max_depth => 2, # unlimited
-            delay  => 1,
+
+            delay  => 0,      # hurry up and fail
             filter => sub {
                 $debug and diag( "doc filter on " . $_[0]->url );
                 $debug and diag( "body:" . $_[0]->content );
             },
-            credentials => 'foo:bar',
-            same_hosts  => ["127.0.0.1"],
+            credentials    => 'foo:bar',
+            same_hosts     => ["127.0.0.1"],
+            modified_since => time2str( time() ),
+            max_size       => 4096,
         ),
         "new spider"
     );

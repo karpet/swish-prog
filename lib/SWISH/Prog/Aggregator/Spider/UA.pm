@@ -50,6 +50,11 @@ my $can_accept = HTTP::Message::decodable();
 
 our $Debug = $ENV{PERL_DEBUG};
 
+sub set_link_tags {
+    my $self = shift;
+    $self->{_swish_link_tags} = shift;
+}
+
 sub get {
     my $self  = shift;
     my %args  = @_;
@@ -69,10 +74,37 @@ sub get {
     my $resp = $self->request($request);
     $self->{_swish_last_uri}  = URI->new($uri);
     $self->{_swish_last_resp} = $resp;
-    
+
     $Debug and dump $resp;
-    
+
     return $resp;
+}
+
+sub head {
+    my $self  = shift;
+    my %args  = @_;
+    my $uri   = $args{uri} or croak "URI required";
+    my $delay = $args{delay} || 0;
+
+    sleep($delay) if $delay;
+
+    my $request = HTTP::Request->new( 'HEAD' => $uri );
+    $request->header( 'Accept-Encoding' => $can_accept, );
+    if ( $args{user} and $args{pass} ) {
+        $request->authorization_basic( $args{user}, $args{pass} );
+    }
+
+    ( $Debug & 2 ) and dump $request;
+
+    my $resp = $self->request($request);
+
+    ( $Debug & 2 ) and dump $resp;
+
+    return $resp;
+}
+
+sub redirect_ok {
+    return 0;    # do not follow any redirects
 }
 
 =head2 response
@@ -160,55 +192,61 @@ using HTML::LinkExtor.
 =cut
 
 sub links {
-    my $self     = shift;
-    my $response = $self->response;
-    my @links    = ();
-    if ($response) {
-        my $le = HTML::LinkExtor->new();
-        $le->parse( $response->decoded_content );
+    my $self  = shift;
+    my @links = ();
+    if ( $self->response and $self->is_html ) {
+        my $le   = HTML::LinkExtor->new();
+        my $base = $self->response->base;
+        $le->parse( $self->content );
 
         my %skipped_tags;
 
         for my $link ( $le->links ) {
             my ( $tag, %attr ) = @$link;
 
-            # which tags to use ( not reported in debug )
-
+            # which tags to use
             my $attr = join ' ', map {qq[$_="$attr{$_}"]} keys %attr;
 
-            warn "\nLooking at extracted tag '<$tag $attr>'\n"
-                if $Debug;
+            $Debug and warn "$base [extracted tag '<$tag $attr>']\n";
+
+            if ( !exists $self->{_swish_link_tags}->{$tag} ) {
+                $Debug
+                    and warn
+                    "$base [skipping tag '<$tag $attr>', not on whitelist]\n";
+                next;
+            }
 
             # Grab which attribute(s) which might contain links for this tag
             my $links = $HTML::Tagset::linkElements{$tag};
             $links = [$links] unless ref $links;
 
-            my $found;
+            my $found = 0;
 
-            # Now, check each attribut to see if a link exists
-
+            # check each attribute to see if a link exists
             for my $attribute (@$links) {
                 if ( $attr{$attribute} ) {
-                    my $u
-                        = URI->new_abs( $attr{$attribute}, $response->base );
 
+                    # strip any anchors as noise
+                    $attr{$attribute} =~ s/#.*//;
+
+                    my $u = URI->new_abs( $attr{$attribute}, $base );
                     push @links, $u;
-                    warn
-                        qq[   $attribute="$u" Added to list of links to follow\n]
-                        if $Debug;
+                    $Debug
+                        and warn
+                        sprintf( "%s [added '%s' to links]\n", $base, $u );
                     $found++;
                 }
             }
 
             if ( !$found && $Debug ) {
                 warn
-                    "  tag did not include any links to follow or is a duplicate\n";
+                    "$base [tag <$tag $attr> has no links or is a duplicate]\n";
             }
 
         }
 
-        warn "! Found ", scalar @links, " links in ", $response->base, "\n\n"
-            if $Debug;
+        $Debug
+            and warn sprintf( "%s [found %s links]\n", $base, scalar @links );
 
     }
     return @links;
