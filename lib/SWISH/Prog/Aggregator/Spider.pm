@@ -70,12 +70,12 @@ SWISH::Prog::Aggregator::Spider - web aggregator
 
 SWISH::Prog::Aggregator::Spider is a web crawler similar to
 the spider.pl script in the Swish-e 2.4 distribution. Internally,
-SWISH::Prog::Aggregator::Spider uses LWP::RobotUA to the hard work.
-See SWISH::Prog::Aggregator::Spider::UA.
+SWISH::Prog::Aggregator::Spider uses LWP::RobotUA to do the hard work.
+See L<SWISH::Prog::Aggregator::Spider::UA>.
 
 =head1 METHODS
 
-See SWISH::Prog::Aggregator
+See L<SWISH::Prog::Aggregator>.
 
 =head2 new( I<params> )
 
@@ -238,8 +238,7 @@ sub init {
 
     $self->{queue}     ||= SWISH::Prog::Queue->new;
     $self->{uri_cache} ||= SWISH::Prog::Cache->new;
-    $self->{_uri_ok_cache} = SWISH::Prog::Cache->new;
-    $self->{_auth_cache}   = SWISH::Prog::Cache->new;  # ALWAYS inmemory cache
+    $self->{_auth_cache} = SWISH::Prog::Cache->new;    # ALWAYS inmemory cache
     $self->{ua} ||= SWISH::Prog::Aggregator::Spider::UA->new( $self->{agent},
         $self->{email}, );
 
@@ -305,10 +304,13 @@ sub uri_ok {
     my $uri  = shift or croak "URI required";
     my $str  = $uri->canonical->as_string;
     $str =~ s/#.*//;    # target anchors create noise
-    return 0 if $self->{_uri_ok_cache}->has($str);
-    $self->{_uri_ok_cache}->add($str);
 
     ( $self->verbose > 1 ) and warn "checking uri_ok: $str\n";
+
+    if ( $uri->scheme !~ m,^http, ) {
+        $self->debug and warn "$str [skipping, unsupported scheme]\n";
+        return 0;
+    }
 
     # check if we're on the same host.
     if ( $uri->rel( $self->{_base} ) eq $uri ) {
@@ -649,7 +651,7 @@ sub _make_request {
 
     if ( $self->{use_md5} ) {
         my $fingerprint = $response->header('Content-MD5')
-            || Digest::MD5::md5($buf);
+            || Digest::MD5::md5_base64($buf);
         if ( $self->md5_cache->has($fingerprint) ) {
             return "duplicate content for "
                 . $self->md5_cache->get($fingerprint);
