@@ -179,7 +179,6 @@ SKIP: {
     my $debug    = $ENV{PERL_DEBUG};
 
     ok( my $spider = SWISH::Prog::Aggregator::Spider->new(
-            indexer => SWISH::Prog::Test::Indexer->new(),
             verbose => $debug,
             debug   => $debug,
             email   => 'noone@swish-e.org',

@@ -887,8 +887,11 @@ sub looks_like_feed {
 =head2 crawl( I<uri> )
 
 Implements the required crawl() method. Recursively fetches I<uri>
-and its child links to a depth set in max_depth(). Will quit
-after max_files() unless max_files==0.
+and its child links to a depth set in max_depth(). 
+
+Will quit after max_files() unless max_files==0.
+
+Will quit after max_time() seconds unless max_time==0.
 
 =cut
 
@@ -896,7 +899,7 @@ sub crawl {
     my $self = shift;
     my @urls = @_;
 
-    my $indexer = $self->indexer;
+    my $indexer = $self->indexer;    # may be undef
 
     my $started = time();
 
@@ -909,8 +912,13 @@ sub crawl {
         while ( my $doc = $self->get_doc ) {
             $self->debug and warn '=' x 80, "\n";
             next unless blessed($doc);
-            $indexer->process($doc);
+
+            # indexer not required
+            $indexer->process($doc) if $indexer;
+
             $self->_increment_count;
+
+            # abort if we've met any max_* conditions
             last if $self->max_files and $self->count >= $self->max_files;
             last
                 if $self->max_time
