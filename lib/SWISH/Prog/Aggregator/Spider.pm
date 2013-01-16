@@ -60,7 +60,7 @@ SWISH::Prog::Aggregator::Spider - web aggregator
 
  use SWISH::Prog::Aggregator::Spider;
  my $spider = SWISH::Prog::Aggregator::Spider->new(
-        indexer => SWISH::Prog::Indexer->new
+     indexer => SWISH::Prog::Indexer->new
  );
  
  $spider->indexer->start;
@@ -438,7 +438,7 @@ sub _add_links {
         $self->uri_cache->add( $uri => $self->{_current_depth} );
 
         if ( $self->uri_ok($uri) ) {
-            $self->queue->put($uri);
+            $self->add_to_queue($uri);
         }
     }
 }
@@ -563,6 +563,51 @@ sub _get_basic_credentials {
 
 }
 
+=head2 add_to_queue( I<uri> )
+
+Add I<uri> to the queue.
+
+=cut
+
+sub add_to_queue {
+    my $self = shift;
+    my $uri = shift or croak "uri required";
+    return $self->queue->put($uri);
+}
+
+=head2 next_from_queue
+
+Return next I<uri> from queue.
+
+=cut
+
+sub next_from_queue {
+    my $self = shift;
+    return $self->queue->get();
+}
+
+=head2 left_in_queue
+
+Returns queue()->size().
+
+=cut
+
+sub left_in_queue {
+    return shift->queue->size();
+}
+
+=head2 remove_from_queue( I<uri> )
+
+Calls queue()->remove(I<uri>).
+
+=cut
+
+sub remove_from_queue {
+    my $self = shift;
+    my $uri = shift or croak "uri required";
+    return $self->queue->remove($uri);
+}
+
 =head2 get_doc
 
 Returns the next URI from the queue() as a SWISH::Prog::Doc object,
@@ -576,10 +621,10 @@ sub get_doc {
     my $self = shift;
 
     # return unless we have something in the queue
-    return unless $self->queue->size;
+    return unless $self->left_in_queue();
 
     # pop the queue and make it a URI
-    my $uri   = $self->queue->get;
+    my $uri   = $self->next_from_queue();
     my $depth = $self->uri_cache->get($uri);
 
     $self->debug
@@ -593,7 +638,7 @@ sub get_doc {
     my $doc = $self->_make_request($uri);
 
     if ($doc) {
-        $self->queue->remove($uri);
+        $self->remove_from_queue($uri);
     }
 
     return $doc;
@@ -859,7 +904,7 @@ sub crawl {
         $self->debug and warn "crawling $url\n";
         my $uri = URI->new($url)->canonical;
         $self->uri_cache->add( $uri => 1 );
-        $self->queue->put($uri);
+        $self->add_to_queue($uri);
         $self->{_base} = $uri->as_string;
         while ( my $doc = $self->get_doc ) {
             $self->debug and warn '=' x 80, "\n";
