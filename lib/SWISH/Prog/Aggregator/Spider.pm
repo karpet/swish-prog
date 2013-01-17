@@ -901,10 +901,10 @@ sub crawl {
 
     my $indexer = $self->indexer;    # may be undef
 
-    my $started = time();
-
     for my $url (@urls) {
+        my $started = time();
         $self->debug and warn "crawling $url\n";
+        
         my $uri = URI->new($url)->canonical;
         $self->uri_cache->add( $uri => 1 );
         $self->add_to_queue($uri);
