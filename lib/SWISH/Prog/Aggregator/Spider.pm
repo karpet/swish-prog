@@ -328,7 +328,8 @@ sub uri_ok {
     my $str  = $uri->canonical->as_string;
     $str =~ s/#.*//;    # target anchors create noise
 
-    ( $self->verbose > 1 ) and warn "$str [checking uri_ok]\n";
+    ( $self->verbose > 1 || $self->debug )
+        and warn "$str [checking if ok]\n";
 
     if ( $uri->scheme !~ m,^http, ) {
         $self->debug and warn "$str [skipping, unsupported scheme]\n";
@@ -344,7 +345,7 @@ sub uri_ok {
         {
             my $host = $uri->canonical->authority;
             $self->debug
-                and warn "$uri [skipping, not on same host as $host]\n";
+                and warn "$uri [skipping, different host $host]\n";
             return 0;
         }
 
@@ -355,7 +356,7 @@ sub uri_ok {
     my $mime = $utils->mime_type($path);
 
     if ( !exists $parser_types{$mime} ) {
-        $self->debug and warn "$uri [skipping, no parser for $mime]";
+        $self->debug and warn "$uri [skipping, no parser for $mime]\n";
         return 0;
     }
 
@@ -414,7 +415,7 @@ sub uri_ok {
 
     }
 
-    ( $self->verbose > 1 ) and warn "$str [ok]\n";
+    ( $self->verbose > 1 || $self->debug ) and warn "$str [ok]\n";
     return 1;
 }
 
@@ -904,7 +905,7 @@ sub crawl {
     for my $url (@urls) {
         my $started = time();
         $self->debug and warn "crawling $url\n";
-        
+
         my $uri = URI->new($url)->canonical;
         $self->uri_cache->add( $uri => 1 );
         $self->add_to_queue($uri);
