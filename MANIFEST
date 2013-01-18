@@ -16,6 +16,7 @@ lib/SWISH/Prog/Aggregator/MailFS.pm
 lib/SWISH/Prog/Aggregator/Object.pm
 lib/SWISH/Prog/Aggregator/Spider.pm
 lib/SWISH/Prog/Aggregator/Spider/UA.pm
+lib/SWISH/Prog/Aggregator/Spider/Response.pm
 lib/SWISH/Prog/Cache.pm
 lib/SWISH/Prog/Class.pm
 lib/SWISH/Prog/Config.pm

@@ -301,3 +301,6 @@ Revision history for Perl extension Prog.
         * Spider authorization features now work. Added bona fide test suite for spidering.
         * expand Queue API to add remove() and clean() and internal locking on get()
         * Spider->modified_since feature to allow for incremental crawls
+        * Added new class SWISH::Prog::Aggregator::Spider::Response, refactoring appropriate UA methods
+          into Response class since WWW::Mechanize was intentionally blurring the logical distinction.
+

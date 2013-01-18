@@ -3,13 +3,11 @@ use strict;
 use warnings;
 use base qw( LWP::RobotUA );
 use HTTP::Message;
-use HTML::LinkExtor;
 use URI;
-use HTML::Tagset;
-use HTML::HeadParser;
 use Carp;
 use Data::Dump qw( dump );
 use Search::Tools::UTF8;
+use SWISH::Prog::Aggregator::Spider::Response;
 
 our $VERSION = '0.67';
 
@@ -21,6 +19,8 @@ my $can_accept = HTTP::Message::decodable();
 #warn "Accept-Encoding: $can_accept\n";
 
 our $Debug = $ENV{PERL_DEBUG} || 0;
+
+our $Response_Class = 'SWISH::Prog::Aggregator::Spider::Response';
 
 =pod
 
@@ -57,20 +57,25 @@ Also supported: I<user> and I<pass> for authorization.
 sub get {
     my $self  = shift;
     my %args  = @_;
-    my $uri   = $args{uri} or croak "URI required";
-    my $delay = $args{delay} || 0;
+    my $uri   = delete $args{uri} or croak "URI required";
+    my $delay = delete $args{delay} || 0;
 
     sleep($delay) if $delay;
 
     my $request = HTTP::Request->new( 'GET' => $uri );
     $request->header( 'Accept-Encoding' => $can_accept, );
     if ( $args{user} and $args{pass} ) {
-        $request->authorization_basic( $args{user}, $args{pass} );
+        $request->authorization_basic( delete $args{user},
+            delete $args{pass} );
     }
 
     ( $Debug & 2 ) and dump $request;
 
-    my $resp = $self->request($request);
+    my $resp = $self->get_response_class->new(
+        http_response => $self->request($request),
+        link_tags     => $self->{_swish_link_tags},
+        %args,
+    );
     $self->{_swish_last_uri}  = URI->new($uri);
     $self->{_swish_last_resp} = $resp;
 
@@ -92,20 +97,25 @@ Also supported: I<user> and I<pass> for authorization.
 sub head {
     my $self  = shift;
     my %args  = @_;
-    my $uri   = $args{uri} or croak "URI required";
-    my $delay = $args{delay} || 0;
+    my $uri   = delete $args{uri} or croak "URI required";
+    my $delay = delete $args{delay} || 0;
 
     sleep($delay) if $delay;
 
     my $request = HTTP::Request->new( 'HEAD' => $uri );
     $request->header( 'Accept-Encoding' => $can_accept, );
     if ( $args{user} and $args{pass} ) {
-        $request->authorization_basic( $args{user}, $args{pass} );
+        $request->authorization_basic( delete $args{user},
+            delete $args{pass} );
     }
 
     ( $Debug & 2 ) and dump $request;
 
-    my $resp = $self->request($request);
+    my $resp = $self->get_response_class->new(
+        http_response => $self->request($request),
+        link_tags     => $self->{_swish_link_tags},
+        %args,
+    );
 
     ( $Debug & 2 ) and dump $resp;
 
@@ -124,23 +134,13 @@ sub redirect_ok {
 
 =head2 response
 
-Returns most recent HTTP::Response object.
+Returns most recent Response object.
 
 =cut
 
 sub response {
     my $self = shift;
     return $self->{_swish_last_resp};
-}
-
-=head2 success
-
-Shortcut for $ua->response->is_success.
-
-=cut
-
-sub success {
-    return shift->response->is_success;
 }
 
 =head2 uri
@@ -153,124 +153,10 @@ sub uri {
     return shift->{_swish_last_uri};
 }
 
-=head2 status
-
-Shortcut for $ua->response->code.
-
-=cut
-
-sub status {
-    return shift->response->code;
-}
-
-=head2 ct
-
-Shortcut for $ua->response->header('content-type').
-
-=cut
-
-sub ct {
-    my $self = shift;
-    my $ct   = $self->response->header('content-type');
-    $ct =~ s/;.+// if $ct;
-    return $ct;
-}
-
-=head2 is_html
-
-Returns true if ct() looks like HTML or XHTML.
-
-=cut
-
-sub is_html {
-    my $self = shift;
-    my $ct   = $self->ct;
-    return defined $ct
-        && ( $ct eq 'text/html' || $ct eq 'application/xhtml+xml' );
-}
-
-=head2 content
-
-Shortcut for $ua->response->decoded_content.
-
-=cut
-
-sub content {
-    return shift->response->decoded_content;
-}
-
-=head2 links
-
-Returns array of href targets in content(). Parsed
-using HTML::LinkExtor.
-
-=cut
-
-sub links {
-    my $self  = shift;
-    my @links = ();
-    if ( $self->response and $self->is_html ) {
-        my $le   = HTML::LinkExtor->new();
-        my $base = $self->response->base;
-        $le->parse( $self->content );
-
-        my %skipped_tags;
-
-        for my $link ( $le->links ) {
-            my ( $tag, %attr ) = @$link;
-
-            # which tags to use
-            my $attr = join ' ', map {qq[$_="$attr{$_}"]} keys %attr;
-
-            $Debug and warn "$base [extracted tag '<$tag $attr>']\n";
-
-            if ( !exists $self->{_swish_link_tags}->{$tag} ) {
-                $Debug
-                    and warn
-                    "$base [skipping tag '<$tag $attr>', not on whitelist]\n";
-                next;
-            }
-
-            # Grab which attribute(s) which might contain links for this tag
-            my $links = $HTML::Tagset::linkElements{$tag};
-            $links = [$links] unless ref $links;
-
-            my $found = 0;
-
-            # check each attribute to see if a link exists
-            for my $attribute (@$links) {
-                if ( $attr{$attribute} ) {
-
-                    # strip any anchors as noise
-                    $attr{$attribute} =~ s/#.*//;
-
-                    my $u = URI->new_abs( $attr{$attribute}, $base );
-                    push @links, $u;
-                    $Debug
-                        and warn
-                        sprintf( "%s [added '%s' to links]\n", $base, $u );
-                    $found++;
-                }
-            }
-
-            if ( !$found && $Debug ) {
-                warn
-                    "$base [tag <$tag $attr> has no links or is a duplicate]\n";
-            }
-
-        }
-
-        $Debug
-            and warn sprintf( "%s [found %s links]\n", $base, scalar @links );
-
-    }
-    return @links;
-}
-
 =head2 set_link_tags( I<hashref> )
 
-Set hashref of tags considered valid "links". Used by the links()
-method. This method is used internally by the Spider class.
+Set hashref of tags considered valid "links". Passed into every
+Response object in the link_tags() accessor.
 
 =cut
 
@@ -279,29 +165,25 @@ sub set_link_tags {
     $self->{_swish_link_tags} = shift;
 }
 
-=head2 title
+=head2 set_response_class( I<class> )
 
-Returns document title, verifying that UTF-8
-flag is set correctly on the response content.
+Set the Response class. Default is B<SWISH::Prog::Aggregator::Spider::Response>.
 
 =cut
 
-sub title {
+sub set_response_class {
     my $self = shift;
-    return unless $self->is_html;
+    $self->{_swish_response_class} = shift;
+}
 
-    my $p = HTML::HeadParser->new;
+=head2 get_response_class
 
-    # HTML::HeadParser throws warning if utf-8 flag is not on for utf-8 bytes.
-    # So we trust the content-type header and
-    # verify that the utf-8 flag is on.
-    if ( $self->response->header('content-type') =~ m/utf-8/i ) {
-        $p->parse( to_utf8( $self->content ) );
-    }
-    else {
-        $p->parse( $self->content );
-    }
-    return $p->header('Title');
+Returns the class name of objects returned from get() and head().
+
+=cut
+
+sub get_response_class {
+    return shift->{_swish_response_class} || $Response_Class;
 }
 
 1;

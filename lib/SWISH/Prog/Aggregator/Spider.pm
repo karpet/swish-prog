@@ -264,7 +264,8 @@ sub init {
 
     # whitelist which HTML tags we consider "links"
     # should be subset of what HTML::LinkExtor considers links
-    $self->{link_tags} = ['a'] unless ref $self->{link_tags} eq 'ARRAY';
+    $self->{link_tags} = [ 'a', 'frame', 'iframe' ]
+        unless ref $self->{link_tags} eq 'ARRAY';
     $self->{ua}
         ->set_link_tags( { map { lc($_) => 1 } @{ $self->{link_tags} } } );
 
@@ -366,8 +367,10 @@ sub uri_ok {
     # head request to check max_size and modified_since
     if ( $self->max_size or $self->modified_since ) {
         my %head_args = (
-            uri   => $uri,
-            delay => 0,      # assume head checks are tiny drain on server
+            uri     => $uri,
+            delay   => 0,                # assume each get() applies the delay
+            debug   => $self->debug,
+            verbose => $self->verbose,
         );
 
         if ( my ( $user, $pass ) = $self->_get_user_pass($uri) ) {
@@ -377,7 +380,7 @@ sub uri_ok {
         my $resp = $self->ua->head(%head_args);
 
         # early abort if resource doesn't exist
-        if ( $resp->code == 404 ) {
+        if ( $resp->status == 404 ) {
             $self->debug
                 and warn "$uri [skipping, 404 not found]\n";
             return 0;
@@ -661,7 +664,7 @@ sub get_authorized_doc {
     my $response = shift or croak "response required";
 
     # set up credentials
-    $self->_authorize( $uri, $response ) or return;
+    $self->_authorize( $uri, $response->http_response ) or return;
 
     return $self->_make_request($uri);
 }
@@ -688,8 +691,10 @@ sub _make_request {
     warn "get $uri [delay:$delay]\n" if $self->verbose;
 
     my %get_args = (
-        uri   => $uri,
-        delay => $delay,
+        uri     => $uri,
+        delay   => $delay,
+        debug   => $self->debug,
+        verbose => $self->verbose,
     );
 
     if ( my ( $user, $pass ) = $self->_get_user_pass($uri) ) {
@@ -698,7 +703,8 @@ sub _make_request {
     }
 
     # fetch the uri. $ua handles delay internally.
-    my $response = $ua->get(%get_args);
+    my $response      = $ua->get(%get_args);
+    my $http_response = $response->http_response;
 
     # flag current time for next delay calc.
     $self->{_last_response_time} = time();
@@ -708,21 +714,21 @@ sub _make_request {
         my $location = $response->header('location');
         if ( !$location ) {
             warn "$uri [skipping, redirect without a Location header]\n";
-            return $response->code;
+            return $response->status;
         }
         $self->debug
             and warn "$uri [redirect: $location]\n";
         if ( $self->follow_redirects ) {
             $self->_add_links( $uri,
-                URI->new_abs( $location, $response->base ) );
+                URI->new_abs( $location, $http_response->base ) );
         }
-        return $response->code;
+        return $response->status;
     }
 
     # add its links to the queue.
     # If the resource looks like an XML feed of some kind,
     # glean its links differently than if it is an HTML response.
-    if ( my $feed = $self->looks_like_feed($response) ) {
+    if ( my $feed = $self->looks_like_feed($http_response) ) {
         my @links;
         for my $entry ( $feed->entries ) {
             push @links, URI->new( $entry->link );
@@ -731,33 +737,33 @@ sub _make_request {
 
         # we don't want the feed content, we want the links.
         # TODO make this optional
-        return $response->code;
+        return $response->status;
     }
     else {
-        $self->_add_links( $uri, $ua->links );
+        $self->_add_links( $uri, $response->links );
     }
 
     # return $uri as a Doc object
-    my $use_uri = $ua->success ? $ua->uri : $uri;
+    my $use_uri = $response->success ? $ua->uri : $uri;
     my $meta = {
         org_uri => $uri,
         ret_uri => ( $use_uri || $uri ),
         depth   => delete $self->{_cur_depth},
-        status  => $ua->status,
-        success => $ua->success,
-        is_html => $ua->is_html,
+        status  => $response->status,
+        success => $response->success,
+        is_html => $response->is_html,
         title   => (
-            $ua->success
-            ? ( $ua->is_html
-                ? ( $ua->title || "No title: $use_uri" )
+            $response->success
+            ? ( $response->is_html
+                ? ( $response->title || "No title: $use_uri" )
                 : $use_uri
                 )
             : "Failed: $use_uri"
         ),
-        ct => ( $ua->success ? $ua->ct : "Unknown" ),
+        ct => ( $response->success ? $response->ct : "Unknown" ),
     };
 
-    my $headers = $response->headers;
+    my $headers = $http_response->headers;
     my $buf     = $response->content;
 
     if ( $self->{use_md5} ) {
@@ -770,7 +776,7 @@ sub _make_request {
         $self->md5_cache->add( $fingerprint => $uri );
     }
 
-    if ( $ua->success ) {
+    if ( $response->success ) {
 
         my $content_type = $meta->{ct};
         if ( !exists $parser_types{$content_type} ) {
@@ -806,32 +812,34 @@ sub _make_request {
         return $self->doc_class->new(%doc);
 
     }
-    elsif ( $response->code == 401 ) {
+    elsif ( $response->status == 401 ) {
 
         # authorize and try again
         warn sprintf( "%s [retrying, %s]\n", $uri, $response->status_line );
         return $self->get_authorized_doc( $uri, $response )
-            || $response->code;
+            || $response->status;
     }
-    elsif ($response->code == 403
-        && $response->status_line =~ m/robots.txt/ )
+    elsif ($response->status == 403
+        && $http_response->status_line =~ m/robots.txt/ )
     {
 
         # ignore
-        warn sprintf( "%s [skipped, %s]\n", $uri, $response->status_line );
+        warn sprintf( "%s [skipped, %s]\n", $uri,
+            $http_response->status_line );
         return $self->get_authorized_doc( $uri, $response )
-            || $response->code;
+            || $response->status;
     }
-    elsif ( $response->code == 403 ) {
+    elsif ( $response->status == 403 ) {
 
         # authorize and try again
-        warn sprintf( "%s [retrying, %s]\n", $uri, $response->status_line );
+        warn sprintf( "%s [retrying, %s]\n",
+            $uri, $http_response->status_line );
         return $self->get_authorized_doc( $uri, $response );
     }
     else {
 
-        warn sprintf( "%s [%s]\n", $uri, $response->status_line );
-        return $response->code;
+        warn sprintf( "%s [%s]\n", $uri, $http_response->status_line );
+        return $response->status;
     }
 
     return;    # never get here.
@@ -878,7 +886,7 @@ sub looks_like_feed {
         or $ct eq 'application/rdf+xml'
         or $ct eq 'application/atom+xml' )
     {
-        my $xml = $response->content;
+        my $xml = $response->decoded_content;    # TODO or content()
         return XML::Feed->parse( \$xml );
     }
 
