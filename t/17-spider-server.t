@@ -113,6 +113,8 @@ SKIP: {
                 qq(<a href="redirect/elsewhere">redirect elsewhere</a>),
                 qq(<a href="old/page">old and in the way</a>),
                 qq(<a href="size/big">big file</a>),
+                qq(<a href="skip-me/bad-pattern">FileRules skip</a>),
+                qq(<a href="skip-me/bad?query=pass">FileRules skip</a>),
                 qq(<img src="img/test" />),
                 $cgi->end_html;
         }
@@ -186,7 +188,16 @@ SKIP: {
 
             #max_depth => 2, # unlimited
 
-            delay  => 0,      # hurry up and fail
+            file_rules => [
+                'filename contains bad-pattern',
+
+                #'filename contains \?',    # anything with query string
+                'filename contains \?.*query=pass',    # specific query param
+            ],
+
+            # hurry up and fail
+            delay => 0,
+
             filter => sub {
                 $debug and diag( "doc filter on " . $_[0]->url );
                 $debug and diag( "body:" . $_[0]->content );

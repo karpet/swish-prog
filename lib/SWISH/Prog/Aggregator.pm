@@ -311,7 +311,7 @@ sub set_ok_if_newer_than {
 }
 
 #
-# private method
+# private methods
 #
 
 sub _increment_count {
@@ -326,6 +326,32 @@ sub _increment_count {
         }
     }
     return $self;
+}
+
+sub _apply_file_rules {
+    my ( $self, $file, $file_rules ) = @_;
+    if (   !$file_rules
+        && !exists $self->{_file_rules}
+        && $self->config->FileRules )
+    {
+
+        # cache obj
+        $self->{_file_rules} = File::Rules->new( $self->config->FileRules );
+    }
+    if ( $file_rules or exists $self->{_file_rules} ) {
+        $self->debug and warn "applying FileRules";
+        my $rules = $file_rules || $self->{_file_rules};
+        my $match = $rules->match($file);
+        return $match;
+    }
+    return 0;    # no rules
+}
+
+sub _apply_file_match {
+    my ( $self, $file ) = @_;
+
+    # TODO
+    return 0;    # no-op for now
 }
 
 1;

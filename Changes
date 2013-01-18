@@ -303,4 +303,5 @@ Revision history for Perl extension Prog.
         * Spider->modified_since feature to allow for incremental crawls
         * Added new class SWISH::Prog::Aggregator::Spider::Response, refactoring appropriate UA methods
           into Response class since WWW::Mechanize was intentionally blurring the logical distinction.
+        * Spider->file_rules (new feature) follows same code path as Aggregator::FS.
 

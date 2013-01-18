@@ -64,12 +64,19 @@ sub get {
 
     my $request = HTTP::Request->new( 'GET' => $uri );
     $request->header( 'Accept-Encoding' => $can_accept, );
-    if ( $args{user} and $args{pass} ) {
+    if ( $args{user} && $args{pass} ) {
         $request->authorization_basic( delete $args{user},
             delete $args{pass} );
     }
+    else {
+        # if either one was set, but not the other, delete them both
+        # to prevent response_class from dying
+        delete $args{pass};
+        delete $args{user};
+    }
 
     ( $Debug & 2 ) and dump $request;
+    ( $Debug & 3 ) and dump \%args;
 
     my $resp = $self->get_response_class->new(
         http_response => $self->request($request),
@@ -104,9 +111,15 @@ sub head {
 
     my $request = HTTP::Request->new( 'HEAD' => $uri );
     $request->header( 'Accept-Encoding' => $can_accept, );
-    if ( $args{user} and $args{pass} ) {
+    if ( $args{user} && $args{pass} ) {
         $request->authorization_basic( delete $args{user},
             delete $args{pass} );
+    }
+    else {
+        # if either one was set, but not the other, delete them both
+        # to prevent response_class from dying
+        delete $args{pass};
+        delete $args{user};
     }
 
     ( $Debug & 2 ) and dump $request;

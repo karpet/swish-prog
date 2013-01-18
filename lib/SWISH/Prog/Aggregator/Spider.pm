@@ -13,6 +13,7 @@ use SWISH::Prog::Cache;
 use SWISH::Prog::Aggregator::Spider::UA;
 use Search::Tools::UTF8;
 use XML::Feed;
+use File::Rules;
 
 __PACKAGE__->mk_accessors(
     qw(
@@ -22,6 +23,7 @@ __PACKAGE__->mk_accessors(
         credentials
         delay
         email
+        file_rules
         follow_redirects
         keep_alive
         link_tags
@@ -107,6 +109,10 @@ been fetched already.
 
 If use_md5() is true, this SWISH::Prog::Cache-derived object tracks
 the URI fingerprints.
+
+=item file_rules I<File_Rules_object>
+
+Apply File::Rules object in uri_ok().
 
 =item queue I<queue_object>
 
@@ -308,6 +314,19 @@ sub init {
         $self->{md5_cache} ||= SWISH::Prog::Cache->new;
     }
 
+    # if SWISH::Prog::Config defined, use that for some items
+    if ( $self->{indexer} and $self->config ) {
+        if ( $self->config->FileRules && !$self->{file_rules} ) {
+            $self->{file_rules}
+                = File::Rules->new( $self->config->FileRules );
+        }
+    }
+
+    # make it an object if it is just an array
+    if ( $self->{file_rules} and !blessed( $self->{file_rules} ) ) {
+        $self->{file_rules} = File::Rules->new( $self->{file_rules} );
+    }
+
     # from spider.pl. not sure if we need it or not.
     # Lame Microsoft
     $URI::ABS_REMOTE_LEADING_DOTS = $self->{remove_leading_dots} ? 1 : 0;
@@ -329,8 +348,10 @@ sub uri_ok {
     my $str  = $uri->canonical->as_string;
     $str =~ s/#.*//;    # target anchors create noise
 
-    ( $self->verbose > 1 || $self->debug )
-        and warn "$str [checking if ok]\n";
+    if ( $self->verbose > 1 || $self->debug ) {
+        warn '-' x 80, $/;
+        warn "$str [checking if ok]\n";
+    }
 
     if ( $uri->scheme !~ m,^http, ) {
         $self->debug and warn "$str [skipping, unsupported scheme]\n";
@@ -361,8 +382,17 @@ sub uri_ok {
         return 0;
     }
 
-    # TODO
     # check regex
+    if ( $self->file_rules ) {
+
+        if ( $self->_apply_file_rules( $uri->path_query, $self->file_rules )
+            && !$self->_apply_file_match( $uri->path_query,
+                $self->file_rules ) )
+        {
+            $self->debug and warn "$uri [skipping, matched file_rules]\n";
+            return 0;
+        }
+    }
 
     # head request to check max_size and modified_since
     if ( $self->max_size or $self->modified_since ) {
