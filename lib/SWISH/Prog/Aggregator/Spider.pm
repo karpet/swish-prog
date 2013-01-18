@@ -110,9 +110,11 @@ been fetched already.
 If use_md5() is true, this SWISH::Prog::Cache-derived object tracks
 the URI fingerprints.
 
-=item file_rules I<File_Rules_object>
+=item file_rules I<File_Rules_or_ARRAY>
 
-Apply File::Rules object in uri_ok().
+Apply L<File::Rules> object in uri_ok(). I<File_Rules_or_ARRAY> should
+be a L<File::Rules> object or an array of strings suitable to passing
+to File::Rules->new().
 
 =item queue I<queue_object>
 
