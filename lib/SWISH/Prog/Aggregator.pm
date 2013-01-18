@@ -339,7 +339,7 @@ sub _apply_file_rules {
         $self->{_file_rules} = File::Rules->new( $self->config->FileRules );
     }
     if ( $file_rules or exists $self->{_file_rules} ) {
-        $self->debug and warn "applying FileRules";
+        $self->debug and warn "$file [applying FileRules]\n";
         my $rules = $file_rules || $self->{_file_rules};
         my $match = $rules->match($file);
         return $match;
