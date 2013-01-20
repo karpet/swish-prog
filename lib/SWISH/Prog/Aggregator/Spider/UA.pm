@@ -18,7 +18,7 @@ my $can_accept = HTTP::Message::decodable();
 
 #warn "Accept-Encoding: $can_accept\n";
 
-our $Debug = $ENV{PERL_DEBUG} || 0;
+our $Debug = $ENV{SPIDER_DEBUG} || 0;
 
 our $Response_Class = 'SWISH::Prog::Aggregator::Spider::Response';
 

@@ -351,12 +351,18 @@ sub uri_ok {
     $str =~ s/#.*//;    # target anchors create noise
 
     if ( $self->verbose > 1 || $self->debug ) {
-        warn '-' x 80, $/;
-        warn "$str [checking if ok]\n";
+        $self->write_log_line();
+        $self->write_log(
+            uri => $uri,
+            msg => "checking if ok",
+        );
     }
 
     if ( $uri->scheme !~ m,^http, ) {
-        $self->debug and warn "$str [skipping, unsupported scheme]\n";
+        $self->debug and $self->write_log(
+            uri => $uri,
+            msg => "skipping, unsupported scheme"
+        );
         return 0;
     }
 
@@ -369,7 +375,10 @@ sub uri_ok {
         {
             my $host = $uri->canonical->authority;
             $self->debug
-                and warn "$uri [skipping, different host $host]\n";
+                and $self->write_log(
+                uri => $uri,
+                msg => "skipping, different host $host",
+                );
             return 0;
         }
 
@@ -380,7 +389,10 @@ sub uri_ok {
     my $mime = $utils->mime_type($path);
 
     if ( !exists $parser_types{$mime} ) {
-        $self->debug and warn "$uri [skipping, no parser for $mime]\n";
+        $self->debug and $self->write_log(
+            uri => $uri,
+            msg => "skipping, no parser for $mime",
+        );
         return 0;
     }
 
@@ -391,7 +403,10 @@ sub uri_ok {
             && !$self->_apply_file_match( $uri->path_query,
                 $self->file_rules ) )
         {
-            $self->debug and warn "$uri [skipping, matched file_rules]\n";
+            $self->debug and $self->write_log(
+                uri => $uri,
+                msg => "skipping, matched file_rules",
+            );
             return 0;
         }
     }
@@ -414,14 +429,20 @@ sub uri_ok {
         # early abort if resource doesn't exist
         if ( $resp->status == 404 ) {
             $self->debug
-                and warn "$uri [skipping, 404 not found]\n";
+                and $self->write_log(
+                uri => $uri,
+                msg => "skipping, 404 not found",
+                );
             return 0;
         }
 
         # redirect? assume ok now and _make_request will check on it later.
         if ( $resp->is_redirect ) {
             $self->debug
-                and warn "$uri [deferring, is_redirect]\n";
+                and $self->write_log(
+                uri => $uri,
+                msg => "deferring, is_redirect",
+                );
             return 1;
         }
 
@@ -431,10 +452,13 @@ sub uri_ok {
             and $self->modified_since > $last_mod )
         {
             $self->debug
-                and warn sprintf(
-                "%s [skipping, last modified %s (%s < %s)]\n",
-                $uri, $resp->header('last-modified'),
-                $last_mod, $self->modified_since
+                and $self->write_log(
+                uri => $uri,
+                msg => sprintf(
+                    "skipping, last modified %s (%s < %s)",
+                    $resp->header('last-modified'), $last_mod,
+                    $self->modified_since
+                ),
                 );
             return 0;
         }
@@ -442,15 +466,21 @@ sub uri_ok {
         if ( $resp->content_length and $self->max_size ) {
             if ( $resp->content_length > $self->max_size ) {
                 $self->debug
-                    and warn sprintf( "%s [skipping, %s > max_size]\n",
-                    $uri, $resp->content_length );
+                    and $self->write_log(
+                    uri => $uri,
+                    msg => sprintf( "skipping, %s > max_size",
+                        $resp->content_length ),
+                    );
                 return 0;
             }
         }
 
     }
 
-    ( $self->verbose > 1 || $self->debug ) and warn "$str [ok]\n";
+    ( $self->verbose > 1 || $self->debug ) and $self->write_log(
+        uri => $uri,
+        msg => "ok",
+    );
     return 1;
 }
 
@@ -468,7 +498,10 @@ sub _add_links {
         my $uri = $l->abs( $self->{_base} ) or next;
         $uri = $uri->canonical;      # normalize
         if ( $self->uri_cache->has($uri) ) {
-            $self->debug and warn "$uri [skipping, already checked]\n";
+            $self->debug and $self->write_log(
+                uri => $uri,
+                msg => "skipping, already checked",
+            );
             next;
         }
         $self->uri_cache->add( $uri => $self->{_current_depth} );
@@ -508,12 +541,13 @@ sub _authorize {
 
                     # add the user/pass to the URI
                     $uri->userinfo($user_pass);
-                    warn " >> set userinfo via _auth_cache\n" if $self->debug;
+
+                   #warn " >> set userinfo via _auth_cache\n" if $self->debug;
                     return 1;
                 }
                 else {
                     # we've tried this before
-                    warn "tried $user_pass before";
+                    #warn "tried $user_pass before";
                     return 0;
                 }
             }
@@ -529,7 +563,8 @@ sub _authorize {
                 $user_pass = $self->{authn_callback}
                     ->( $self, $uri, $response, $realm );
                 $uri->userinfo($user_pass);
-                warn " >> set userinfo via authn_callback\n" if $self->debug;
+
+                #warn " >> set userinfo via authn_callback\n" if $self->debug;
                 return 1;
             }
         }
@@ -664,8 +699,13 @@ sub get_doc {
     my $depth = $self->uri_cache->get($uri);
 
     $self->debug
-        and warn sprintf( "%s [depth:%d max_depth:%s]\n",
-        $uri, $depth, ( $self->max_depth || 'undef' ) );
+        and $self->write_log(
+        uri => $uri,
+        msg => sprintf(
+            "depth:%d max_depth:%s",
+            $depth, ( $self->max_depth || 'undef' )
+        ),
+        );
 
     return if defined $self->max_depth && $depth > $self->max_depth;
 
@@ -717,10 +757,17 @@ sub _make_request {
         my $elapsed = time() - $self->{_last_response_time};
         $delay = $self->{delay} - $elapsed;
         $delay = 0 if $delay < 0;
-        warn " elapsed:$elapsed delay:$delay\n" if $self->debug;
+        $self->debug
+            and $self->write_log(
+            uri => $uri,
+            msg => "elapsed:$elapsed delay:$delay",
+            );
     }
 
-    warn "get $uri [delay:$delay]\n" if $self->verbose;
+    $self->write_log(
+        uri => $uri,
+        msg => "GET delay:$delay",
+    ) if $self->verbose;
 
     my %get_args = (
         uri     => $uri,
@@ -745,11 +792,17 @@ sub _make_request {
     if ( $response->is_redirect ) {
         my $location = $response->header('location');
         if ( !$location ) {
-            warn "$uri [skipping, redirect without a Location header]\n";
+            $self->write_log(
+                uri => $uri,
+                msg => "skipping, redirect without a Location header",
+            );
             return $response->status;
         }
         $self->debug
-            and warn "$uri [redirect: $location]\n";
+            and $self->write_log(
+            uri => $uri,
+            msg => "redirect: $location",
+            );
         if ( $self->follow_redirects ) {
             $self->_add_links( $uri,
                 URI->new_abs( $location, $http_response->base ) );
@@ -812,7 +865,10 @@ sub _make_request {
 
         my $content_type = $meta->{ct};
         if ( !exists $parser_types{$content_type} ) {
-            warn "no parser for $content_type";
+            $self->write_log(
+                uri => $uri,
+                msg => "no parser for $content_type",
+            );
         }
         my $charset = $headers->content_type;
         $charset =~ s/;?$meta->{ct};?//;
@@ -847,7 +903,11 @@ sub _make_request {
     elsif ( $response->status == 401 ) {
 
         # authorize and try again
-        warn sprintf( "%s [retrying, %s]\n", $uri, $response->status_line );
+        $self->write_log(
+            uri => $uri,
+            msg => sprintf( "authn denied, retrying, %s",
+                $response->status_line ),
+        );
         return $self->get_authorized_doc( $uri, $response )
             || $response->status;
     }
@@ -856,21 +916,28 @@ sub _make_request {
     {
 
         # ignore
-        warn sprintf( "%s [skipped, %s]\n", $uri,
-            $http_response->status_line );
+        $self->write_log(
+            uri => $uri,
+            msg => sprintf( "skipped, %s", $http_response->status_line ),
+        );
         return $self->get_authorized_doc( $uri, $response )
             || $response->status;
     }
     elsif ( $response->status == 403 ) {
 
         # authorize and try again
-        warn sprintf( "%s [retrying, %s]\n",
-            $uri, $http_response->status_line );
+        $self->write_log(
+            uri => $uri,
+            msg => sprintf( "retrying, %s", $http_response->status_line ),
+        );
         return $self->get_authorized_doc( $uri, $response );
     }
     else {
 
-        warn sprintf( "%s [%s]\n", $uri, $http_response->status_line );
+        $self->write_log(
+            uri => $uri,
+            msg => $http_response->status_line,
+        );
         return $response->status;
     }
 
@@ -944,14 +1011,17 @@ sub crawl {
 
     for my $url (@urls) {
         my $started = time();
-        $self->debug and warn "crawling $url\n";
+        $self->debug and $self->write_log(
+            uri => $url,
+            msg => "crawling",
+        );
 
         my $uri = URI->new($url)->canonical;
         $self->uri_cache->add( $uri => 1 );
         $self->add_to_queue($uri);
         $self->{_base} = $uri->as_string;
         while ( my $doc = $self->get_doc ) {
-            $self->debug and warn '=' x 80, "\n";
+            $self->debug and $self->write_log_line();
             next unless blessed($doc);
 
             # indexer not required
@@ -968,6 +1038,26 @@ sub crawl {
     }
 
     return $self->count;
+}
+
+=head2 write_log( I<args> )
+
+Passes I<args> to SWISH::Prog::Utils::write_log().
+
+=cut
+
+sub write_log {
+    SWISH::Prog::Utils::write_log(@_);
+}
+
+=head2 write_log_line([I<char>, I<width>])
+
+Pass through to SWISH::Prog::Utils::write_log_line().
+
+=cut
+
+sub write_log_line {
+    SWISH::Prog::Utils::write_log_line(@_);
 }
 
 1;

@@ -304,4 +304,4 @@ Revision history for Perl extension Prog.
         * Added new class SWISH::Prog::Aggregator::Spider::Response, refactoring appropriate UA methods
           into Response class since WWW::Mechanize was intentionally blurring the logical distinction.
         * Spider->file_rules (new feature) follows same code path as Aggregator::FS.
-
+        * added Utils::write_log and ::write_log_line methods for standardizing debug output

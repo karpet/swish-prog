@@ -149,12 +149,17 @@ sub links {
             # which tags to use
             my $attr = join ' ', map {qq[$_="$attr{$_}"]} keys %attr;
 
-            $debug and warn "$base [extracted tag '<$tag $attr>']\n";
+            $debug and SWISH::Prog::Utils->write_log(
+                uri => $base,
+                msg => "extracted tag '<$tag $attr>'"
+            );
 
             if ( !exists $self->link_tags->{$tag} ) {
                 $debug
-                    and warn
-                    "$base [skipping tag '<$tag $attr>', not on whitelist]\n";
+                    and SWISH::Prog::Utils->write_log(
+                    uri => $base,
+                    msg => "skipping tag '<$tag $attr>', not on whitelist"
+                    );
                 next;
             }
 
@@ -174,21 +179,28 @@ sub links {
                     my $u = URI->new_abs( $attr{$attribute}, $base );
                     push @links, $u;
                     $debug
-                        and warn
-                        sprintf( "%s [added '%s' to links]\n", $base, $u );
+                        and SWISH::Prog::Utils->write_log(
+                        uri => $base,
+                        msg => "added '$u' to links",
+                        );
                     $found++;
                 }
             }
 
             if ( !$found && $debug ) {
-                warn
-                    "$base [tag <$tag $attr> has no links or is a duplicate]\n";
+                SWISH::Prog::Utils->write_log(
+                    uri => $base,
+                    msg => "tag <$tag $attr> has no links or is a duplicate",
+                );
             }
 
         }
 
         $debug
-            and warn sprintf( "%s [found %s links]\n", $base, scalar @links );
+            and SWISH::Prog::Utils->write_log(
+            uri => $base,
+            msg => sprintf( "found %d links", scalar @links ),
+            );
 
     }
     return @links;
