@@ -15,6 +15,11 @@ use Search::Tools::UTF8;
 use XML::Feed;
 use File::Rules;
 
+#
+# TODO tests for cookies, non-text urls needing filters
+#
+#
+
 __PACKAGE__->mk_accessors(
     qw(
         agent
