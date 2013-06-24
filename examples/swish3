@@ -253,7 +253,10 @@ elsif ( $Opt->{query} ) {
     my $sclass   = "SWISH::Prog::${format}::Searcher";
     eval "require $sclass";
     croak $@ if $@;
-    my %qp_config = ( query_class_opts => { debug => $Opt->{debug} } );
+    my %qp_config = (
+        dialect          => $format,
+        query_class_opts => { debug => $Opt->{debug} }
+    );
     if ( $Opt->{null_term} ) {
         $qp_config{null_term} = 'NULL';
     }
