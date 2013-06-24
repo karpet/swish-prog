@@ -317,3 +317,5 @@ Revision history for Perl extension Prog.
         * add tests for Utils class.
         * Utils extension regex now matches \w+ rather than hardcoded document extensions.
 
+0.71    xxx
+        * add --null_term feature to swish3 example

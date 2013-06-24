@@ -16,7 +16,7 @@ use Search::Tools::UTF8;
 binmode STDERR, ':utf8';
 binmode STDOUT, ':utf8';
 
-my $VERSION = '3.0.15';
+my $VERSION = '3.0.16';
 
 my $USAGE = qq{$0
  usage:
