@@ -500,6 +500,11 @@ sub _add_links {
 
     $self->{_parent} ||= $parent;    # first time.
 
+    $self->debug and $self->write_log(
+        uri => $parent,
+        msg => sprintf( 'evaluating %s links', scalar(@links) ),
+    );
+
     for my $l (@links) {
         my $uri = $l->abs( $self->{_base} ) or next;
         $uri = $uri->canonical;      # normalize
@@ -1045,7 +1050,8 @@ sub looks_like_sitemap {
     {
         my $xml     = $response->decoded_content;    # TODO or content()
         my $sitemap = WWW::Sitemap::XML->new();
-        if ( !$sitemap->read( string => $xml ) ) {
+        eval { $sitemap->load( string => $xml ); };
+        if ($@) {
             return 0;
         }
         return $sitemap;
