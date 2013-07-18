@@ -11,6 +11,7 @@ __PACKAGE__->mk_accessors(
     qw(
         max_hits
         invindex
+        qp_config
         ),
 );
 
@@ -52,6 +53,10 @@ indexes at once).
 =head2 max_hits
 
 The maximum number of hits to return. Optional. Default is 1000.
+
+=head2 qp_config
+
+Optional hashref passed to Search::Query::Parser->new().
 
 =cut
 
