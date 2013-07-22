@@ -188,7 +188,8 @@ if ( defined $Opt->{verbose} and $Opt->{verbose} == 0 ) {
 }
 
 if ( !exists $ENV{SWISH_WARNINGS} ) {
-    $ENV{SWISH_WARNINGS} = $Opt->{Warnings};
+    $ENV{SWISH_WARNINGS}        = $Opt->{Warnings};
+    $ENV{SWISH_PARSER_WARNINGS} = $Opt->{Warnings};
 }
 
 my %prog_can = ( highlightable_fields => $Opt->{lucy_highlightable}, );
