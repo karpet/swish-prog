@@ -320,3 +320,4 @@ Revision history for Perl extension Prog.
 0.71    xxx
         * add --null_term feature to swish3 example
         * add sitemap support to Spider
+        * swish3 -W <n> sets SWISH_PARSER_WARNINGS env var
