@@ -255,6 +255,6 @@ XML
     );
 
     diag( "spidering " . $base_uri );
-    is( $spider->crawl($base_uri), 4, "crawl" );
+    is( $spider->crawl($base_uri), 5, "crawl" );
 
 }

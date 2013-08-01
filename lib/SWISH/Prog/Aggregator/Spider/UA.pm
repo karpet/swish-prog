@@ -16,6 +16,8 @@ our $VERSION = '0.71';
 # http://stackoverflow.com/questions/1285305/how-can-i-accept-gzip-compressed-content-using-lwpuseragent
 my $can_accept = HTTP::Message::decodable();
 
+# TODO handle when Zlib is *not* installed, via Content-Encoding header
+
 #warn "Accept-Encoding: $can_accept\n";
 
 our $Debug = $ENV{SPIDER_DEBUG} || 0;
