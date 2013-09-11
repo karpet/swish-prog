@@ -1,6 +1,6 @@
 Revision history for Perl extension Prog.
 
-0.72 xxx
+0.72 10 Sept 2013
  - add TRACE_ALL to pod-coverage test to discover why it suddenly started
    epic fail
  - add explicit port to t/17-spider-server, running on 5002
