@@ -1,5 +1,10 @@
 Revision history for Perl extension Prog.
 
+0.72 xxx
+ - add TRACE_ALL to pod-coverage test to discover why it suddenly started
+   epic fail
+ - add explicit port to t/17-spider-server, running on 5002
+
 0.71 1 Aug 2013
  - add --null_term feature to swish3 example
  - add sitemap support to Spider
