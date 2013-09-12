@@ -1,6 +1,6 @@
 Revision history for Perl extension Prog.
 
-0.73 xxx
+0.73 12 Sept 2013
  - turn off Pod tests unless RELEASE_TESTING env var set. Pod::Coverage
    failures were because optional dependencies were not present but
    module load was attempted in order to walk symbol tree for pod tests.
