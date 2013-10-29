@@ -67,7 +67,6 @@ my $USAGE = qq{$0
     -b : begin results at this number
     #-d : next param is delimiter.
     #-E : Append errors to file specified, or stderr if file not specified.
-    -e : Engine option: pass name=value directly to the underlying Engine
     -f : invindex dir to create or search from [index.swish3]
     -F : next param is invindex format (ks, lucy, xapian, native, or dbi) [native]
     -h : print this usage statement
