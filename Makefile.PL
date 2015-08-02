@@ -47,9 +47,9 @@ recommends 'Term::ProgressBar'            => 0;
 
 perl_version '5.8.3';
 license 'http://dev.perl.org/licenses/';
-homepage 'http://dev.swish-e.org/wiki/perl';
+homepage 'https://github.com/karpet/swish-prog';
 bugtracker 'http://rt.cpan.org/NoAuth/Bugs.html?Dist=SWISH-Prog';
-repository 'http://svn.swish-e.org/perl/SWISH-Prog/';
+repository 'https://github.com/karpet/swish-prog';
 
 install_script 'examples/swish3';
 
